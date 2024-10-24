@@ -86,19 +86,17 @@ set(COREINCS
     ${SDL2_MIXER_INCLUDE_DIRS}
     ${OPENGL_INCLUDE_DIR}
     ${EPOXY_INCLUDE_DIR}
-    ${CONFUSE_INCLUDE_DIR}
-    ${XMP_INCLUDE_DIR}
     ${ENET_INCLUDE_DIR}
     ${PNG_INCLUDE_DIR}
     ${ZLIB_INCLUDE_DIR}
 )
 
 set(CORELIBS
-    ${CONFUSE_LIBRARY}
-    ${XMP_LIBRARY}
     ${ENET_LIBRARY}
     ${PNG_LIBRARY}
     ${ZLIB_LIBRARY}
+    openomf::confuse
+    openomf::xmp
 )
 
 if(ARGTABLE2_FOUND)

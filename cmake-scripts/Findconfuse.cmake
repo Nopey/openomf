@@ -1,4 +1,11 @@
 
+IF (VCPKG_TOOLCHAIN)
+    FIND_PACKAGE(unofficial-libconfuse CONFIG REQUIRED)
+    ADD_LIBRARY(openomf::confuse ALIAS unofficial::libconfuse::libconfuse)
+
+    RETURN()
+ENDIF ()
+
 SET(CONFUSE_SEARCH_PATHS
     /usr/local/
     /usr
@@ -27,3 +34,8 @@ ELSE (CONFUSE_FOUND)
 ENDIF (CONFUSE_FOUND)
 
 mark_as_advanced(CONFUSE_INCLUDE_DIR CONFUSE_LIBRARY CONFUSE_SEARCH_PATHS)
+
+add_library(openomf::confuse UNKNOWN IMPORTED)
+set_target_properties(openomf::confuse PROPERTIES
+        IMPORTED_LOCATION "${CONFUSE_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${CONFUSE_INCLUDE_DIR}")

@@ -145,6 +145,20 @@ This needed to change because "proper" SDL convention is #include
 because not all systems place things in SDL/ (see FreeBSD).
 #]=======================================================================]
 
+IF (VCPKG_TOOLCHAIN)
+    IF (TARGET SDL2::Main)
+        RETURN()
+    ENDIF()
+    FIND_PACKAGE(SDL2 CONFIG)
+    ADD_LIBRARY(FindSDL2_SDL2Main INTERFACE)
+    target_link_libraries(FindSDL2_SDL2Main INTERFACE
+        SDL2::SDL2main
+        $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+    )
+    ADD_LIBRARY(SDL2::Main ALIAS FindSDL2_SDL2Main)
+    RETURN()
+ENDIF ()
+
 # Define options for searching SDL2 Library in a custom path
 
 set(SDL2_PATH "" CACHE STRING "Custom SDL2 Library path")
