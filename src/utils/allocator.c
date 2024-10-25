@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #if NDEBUG
 #define ALLOCMETA 0
@@ -44,7 +45,23 @@ void *omf_calloc_real(size_t nmemb, size_t size, const char *file, int line) {
     void *ret = omf_malloc_real(alloc_size, file, line);
 
     // standard calloc zeroes memory.
-    memset(ret, 0, alloc_size);
+    // let's see who's relying on this behavior
+#ifdef WIN32
+#define OMF_PATHSEP "\\"
+#else
+#define OMF_PATHSEP "/"
+#endif
+    char const *sources_that_dont_get_zeroed[] = {
+        // list of sources (or folders of source) that don't get calloc zeroing behavior
+        OMF_PATHSEP "video" OMF_PATHSEP,
+        OMF_PATHSEP "resources" OMF_PATHSEP,
+        OMF_PATHSEP "formats" OMF_PATHSEP
+    };
+    bool bZero = true;
+    for(int x = 0; x < sizeof sources_that_dont_get_zeroed / sizeof sources_that_dont_get_zeroed[0]; x++)
+        bZero &= !strstr(file, sources_that_dont_get_zeroed[x]);
+    if(bZero)
+        memset(ret, 0, alloc_size);
 #else
     void *ret = calloc(nmemb, size);
 #endif
