@@ -24,8 +24,8 @@ void rb_create(ring_buffer *rb, size_t size) {
 void rb_free(ring_buffer *rb) {
     if(rb == NULL)
         return;
-    free(rb->data);
-    free(rb);
+    omf_free(rb->data);
+    // omf_free(rb); // we didn't allocate rb, it's probably on a stack somewhere.
 }
 
 /**
