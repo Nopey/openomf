@@ -212,7 +212,7 @@ component *textinput_create(const text_settings *tconf, const char *text, const 
     component *c = widget_create();
 
     textinput *tb = omf_calloc(1, sizeof(textinput));
-    tb->text = strdup(text);
+    tb->text = omf_strdup(text);
     memcpy(&tb->tconf, tconf, sizeof(text_settings));
     tb->bg_enabled = 1;
     tb->max_chars = 15;

@@ -96,7 +96,7 @@ void menu_presskey_tick(component *c) {
                 return;
             } else {
                 omf_free(*(local->key));
-                *(local->key) = strdup(SDL_GetScancodeName(i));
+                *(local->key) = omf_strdup(SDL_GetScancodeName(i));
                 m->finished = 1;
                 return;
             }

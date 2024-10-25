@@ -42,7 +42,7 @@ void menu_connect_start(component *c, void *userdata) {
 
     // Free old saved address, and set new
     omf_free(settings_get()->net.net_connect_ip);
-    settings_get()->net.net_connect_ip = strdup(addr);
+    settings_get()->net.net_connect_ip = omf_strdup(addr);
 
     // Set up enet host
     local->host = enet_host_create(NULL, 1, 2, 0, 0);

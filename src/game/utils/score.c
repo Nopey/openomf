@@ -286,7 +286,7 @@ int chr_score_clone(chr_score *src, chr_score *dst) {
     while((t = iter_next(&it)) != NULL) {
         score_text t2;
         memcpy(&t2, t, sizeof(score_text));
-        t2.text = strdup(t->text);
+        t2.text = omf_strdup(t->text);
         list_append(&dst->texts, &t2, sizeof(score_text));
     }
     return 0;

@@ -120,12 +120,12 @@ int main(int argc, char *argv[]) {
     if(connect->count > 0) {
         init_flags.net_mode = NET_MODE_CLIENT;
         connect_port = 2097;
-        ip = strdup(connect->sval[0]);
+        ip = omf_strdup(connect->sval[0]);
         if(port->count > 0) {
             connect_port = port->ival[0] & 0xFFFF;
         }
         if(trace->count > 0) {
-            trace_file = strdup(trace->sval[0]);
+            trace_file = omf_strdup(trace->sval[0]);
         }
     } else if(listen->count > 0) {
         init_flags.net_mode = NET_MODE_SERVER;
@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
             listen_port = port->ival[0] & 0xFFFF;
         }
         if(trace->count > 0) {
-            trace_file = strdup(trace->sval[0]);
+            trace_file = omf_strdup(trace->sval[0]);
         }
     } else if(play->count > 0) {
         strncpy(init_flags.rec_file, play->filename[0], 254);

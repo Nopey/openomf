@@ -86,7 +86,7 @@ void lab_dash_main_chr_load(component *c, void *userdata) {
     }
 
     omf_free(settings_get()->tournament.last_name);
-    settings_get()->tournament.last_name = strdup(p1->pilot->name);
+    settings_get()->tournament.last_name = omf_strdup(p1->pilot->name);
     settings_save();
     trnmenu_finish(c);
 }

@@ -109,7 +109,7 @@ component *textslider_create(const text_settings *tconf, const char *text, const
     component *c = widget_create();
 
     textslider *tb = omf_calloc(1, sizeof(textslider));
-    tb->text = strdup(text);
+    tb->text = omf_strdup(text);
     memcpy(&tb->tconf, tconf, sizeof(text_settings));
     component_set_help_text(c, help);
     tb->ticks = 0;
