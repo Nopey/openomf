@@ -17,8 +17,9 @@ char *omf_strdup_real(char const *c_string, const char *file, int line);
 
 #define omf_free(ptr)                                                                                                  \
     do {                                                                                                               \
-        free(ptr);                                                                                                     \
+        omf_free_real(ptr, __FILE__, __LINE__);                                                                        \
         (ptr) = NULL;                                                                                                  \
     } while(0)
+void omf_free_real(void *ptr, char const *file, int line);
 
 #endif // ALLOCATOR_H
