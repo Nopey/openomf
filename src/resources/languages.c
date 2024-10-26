@@ -9,7 +9,7 @@
 static sd_language *language;
 
 int lang_init(void) {
-    const char *filename = pm_get_resource_path(DAT_ENGLISH);
+    const char *filename = pm_get_resource_path(DAT_GERMAN);
 
     // Load up language file
     language = omf_calloc(1, sizeof(sd_language));
