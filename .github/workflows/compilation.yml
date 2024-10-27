@@ -19,13 +19,18 @@ jobs:
   # -----------------------------------------------------------------------------------------------
   formatting-check:
     name: Formatting Check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    env:
+      clang-format-version: '16'
     steps:
     - uses: actions/checkout@v4
+    - name: Install clang-format and fd-find
+      run: |
+        sudo apt-get update
+        sudo apt-get -y install clang-format-${{ env.clang-format-version }} fd-find
     - name: Run clang-format style check
-      uses: jidicula/clang-format-action@v4.13.0
-      with:
-        clang-format-version: '16'
+      run: |
+        fdfind . -e .c -e .h -X clang-format-${{ env.clang-format-version }} --dry-run --Werror
 
   # Run unittests on modern-ish versions of gcc and clang.
   # -----------------------------------------------------------------------------------------------
@@ -50,21 +55,60 @@ jobs:
         sudo apt-get update
         sudo apt-get -y install cmake cmake-data libargtable2-dev libcunit1-dev \
           libsdl2-mixer-dev libconfuse-dev libenet-dev libsdl2-dev libxmp-dev libpng-dev \
-          libepoxy-dev clang-tidy ${{ matrix.config.cc }}
+          libepoxy-dev clang-tidy ninja-build ${{ matrix.config.cc }}
+
+    - name: Configure tests
+      run: >
+        cmake -S . -B build-test
+        -G "Ninja"
+        -DCMAKE_BUILD_TYPE=Debug
+        -DUSE_TIDY=${{ matrix.config.tidy }}
+        -DUSE_TESTS=On
+        -DUSE_SANITIZERS=On
+        -DUSE_TOOLS=On
 
     - name: Build tests
-      run: |
-        mkdir build-test && cd build-test
-        cmake -DCMAKE_BUILD_TYPE=Debug \
-              -DUSE_TIDY=${{ matrix.config.tidy }} \
-              -DUSE_TESTS=On \
-              -DUSE_TOOLS=On ..
-        make -j $(getconf _NPROCESSORS_ONLN)
+      run: >
+        cmake --build build-test
 
     - name: Run tests
-      run: |
-        cd build-test
-        make test ARGS="-V"
+      run: CTEST_OUTPUT_ON_FAILURE=1 cmake --build build-test --target test
+
+  # Build msvc binary, to ensure it doesn't regress.
+  # -----------------------------------------------------------------------------------------------
+  check_msvc:
+    needs: [unittest, formatting-check]
+
+    name: Check Windows MSVC build
+    runs-on: windows-latest
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+
+    steps:
+    - name: Export Github Actions cache environment variables
+      uses: actions/github-script@v7
+      with:
+        script: |
+          core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+          core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+    - uses: actions/checkout@v4
+    - name: Check out VCPKG
+      # must be checked out *after* openomf.git
+      uses: actions/checkout@v4
+      with:
+        repository: 'microsoft/vcpkg'
+        path: 'vcpkg'
+    - uses: lukka/get-cmake@latest
+    - uses: ilammy/msvc-dev-cmd@v1
+    - name: Install VCPKG Dependencies, Configure CMake
+      run: >
+        cmake -S . -B build-msvc
+        -G "Ninja Multi-Config"
+        --toolchain vcpkg/scripts/buildsystems/vcpkg.cmake
+        -DVCPKG_BUILD_TYPE="debug" # skip release deps
+    - name: Build openomf
+      run: cmake --build build-msvc --config Debug --target openomf
 
   # Build ubuntu package, release artifact and update "latest" release if necessary.
   # -----------------------------------------------------------------------------------------------
@@ -277,7 +321,7 @@ jobs:
   # Create a "latest" release
   # -----------------------------------------------------------------------------------------------
   make_release:
-    needs: [build_windows, build_macos-arm, build_ubuntu]
+    needs: [build_windows, build_macos-arm, build_ubuntu, check_msvc]
     if: github.ref == 'refs/heads/master'
 
     name: Make "latest" release
