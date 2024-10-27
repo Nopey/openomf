@@ -244,7 +244,7 @@ endif()
 
 if(WIN32)
     # Don't show console in windows release builds (but enable if debug mode)
-    set_target_properties(openomf PROPERTIES WIN32_EXECUTABLE "$<IF:$<CONFIG:Debug>:OFF,ON>")
+    set_target_properties(openomf PROPERTIES WIN32_EXECUTABLE "$<IF:$<CONFIG:Debug>,OFF,ON>")
 
     # Make sure console apps are always in terminal output mode.
     foreach(TARGET ${TOOL_TARGET_NAMES})
