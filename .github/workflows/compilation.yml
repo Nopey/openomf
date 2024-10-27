@@ -53,22 +53,24 @@ jobs:
         sudo apt-get update
         sudo apt-get -y install cmake cmake-data libargtable2-dev libcunit1-dev \
           libsdl2-mixer-dev libconfuse-dev libenet-dev libsdl2-dev libxmp-dev libpng-dev \
-          libepoxy-dev clang-tidy ${{ matrix.config.cc }}
+          libepoxy-dev clang-tidy ninja-build ${{ matrix.config.cc }}
+
+    - name: Configure tests
+      run: >
+        cmake -S . -B build-test
+        -G "Ninja"
+        -DCMAKE_BUILD_TYPE=Debug
+        -DUSE_TIDY=${{ matrix.config.tidy }}
+        -DUSE_TESTS=On
+        -DUSE_SANITIZERS=On
+        -DUSE_TOOLS=On
 
     - name: Build tests
-      run: |
-        mkdir build-test && cd build-test
-        cmake -DCMAKE_BUILD_TYPE=Debug \
-              -DUSE_TIDY=${{ matrix.config.tidy }} \
-              -DUSE_TESTS=On \
-              -DUSE_SANITIZERS=On \
-              -DUSE_TOOLS=On ..
-        make -j $(getconf _NPROCESSORS_ONLN)
+      run: >
+        cmake --build build-test
 
     - name: Run tests
-      run: |
-        cd build-test
-        make test ARGS="-V"
+      run: CTEST_OUTPUT_ON_FAILURE=1 cmake --build build-test --target test
 
   # Build msvc binary, to ensure it doesn't regress.
   # -----------------------------------------------------------------------------------------------
