@@ -73,7 +73,7 @@ jobs:
   # Build msvc binary, to ensure it doesn't regress.
   # -----------------------------------------------------------------------------------------------
   check_msvc:
-    # needs: [unittest, formatting-check]
+    needs: [unittest, formatting-check]
 
     name: Check Windows MSVC build
     runs-on: windows-latest
