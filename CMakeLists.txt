@@ -244,11 +244,7 @@ endif()
 
 if(MINGW)
     # Don't show console on mingw in release builds (but enable if debug mode)
-    if(NOT ${CMAKE_BUILD_TYPE} MATCHES "Debug")
-        set_target_properties(openomf PROPERTIES LINK_FLAGS "-mwindows")
-    else()
-        set_target_properties(openomf PROPERTIES LINK_FLAGS "-mconsole")
-    endif()
+    set_target_properties(openomf PROPERTIES LINK_FLAGS "$<IF:$<CONFIG:Debug>:-mconsole,-mwindows>")
 
     # Make sure console apps are always in terminal output mode.
     foreach(TARGET ${TOOL_TARGET_NAMES})
