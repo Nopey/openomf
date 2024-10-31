@@ -26,6 +26,7 @@
     "enet",
     "libconfuse",
     "argtable3",
-    "libpng"
+    "libpng",
+    "cunit"
   ]
 }
