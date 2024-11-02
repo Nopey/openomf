@@ -25,12 +25,27 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Install clang-format and fd-find
-      run: |
-        sudo apt-get update
-        sudo apt-get -y install clang-format-${{ env.clang-format-version }} fd-find
+      uses: Eeems-Org/apt-cache-action@v1.3
+      with:
+        packages: clang-format-${{ env.clang-format-version }} fd-find
     - name: Run clang-format style check
       run: |
         fdfind . -e .c -e .h -X clang-format-${{ env.clang-format-version }} --dry-run --Werror
+
+  cmake-formatting-check:
+    name: CMake Formatting Check
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install cmake-format and fd-find
+      run: |
+        sudo apt-get update
+        sudo apt-get -y install cmake-format fd-find
+    - name: Check cmake-format
+      run: |
+        fdfind . -e cmake . -X cmake-format '{}' --in-place --config-files .cmake-format.py
+        fdfind CMakeLists.txt . -X cmake-format '{}' --in-place --config-files .cmake-format.py
+        git --no-pager diff --exit-code
 
   # Run unittests on modern-ish versions of gcc and clang.
   # -----------------------------------------------------------------------------------------------
@@ -44,18 +59,18 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        - { name: "gcc 14",   cc: gcc-14,   tidy: "On"  }
-        - { name: "clang 16", cc: clang-16, tidy: "Off" }
+        - { name: "gcc 14",   cc: gcc-14,   tidy: "Off" }
+        - { name: "clang 18", cc: clang-18, tidy: "On"  }
 
     steps:
     - uses: actions/checkout@v4
-
+    
     - name: Install Ubuntu Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get -y install cmake cmake-data libargtable2-dev libcunit1-dev \
-          libsdl2-mixer-dev libconfuse-dev libenet-dev libsdl2-dev libxmp-dev libpng-dev \
-          libepoxy-dev clang-tidy ${{ matrix.config.cc }}
+      uses: Eeems-Org/apt-cache-action@v1.3
+      with:
+        packages: cmake cmake-data libargtable2-dev libcunit1-dev
+          libsdl2-mixer-dev libconfuse-dev libenet-dev libsdl2-dev libxmp-dev libpng-dev
+          libepoxy-dev clang-tidy-18 ${{ matrix.config.cc }}
 
     - name: Build tests
       run: |
@@ -75,7 +90,7 @@ jobs:
   # Build windows package, release artifact (MSVC)
   # -----------------------------------------------------------------------------------------------
   build_msvc:
-    needs: [unittest, formatting-check]
+    needs: [unittest, formatting-check, cmake-formatting-check]
 
     name: Build windows-amd64 (MSVC)
     runs-on: windows-latest
@@ -157,7 +172,7 @@ jobs:
   # Build ubuntu package, release artifact
   # -----------------------------------------------------------------------------------------------
   build_ubuntu:
-    needs: [unittest, formatting-check]
+    needs: [unittest, formatting-check, cmake-formatting-check]
 
     name: Build ubuntu-latest
     runs-on: ubuntu-latest
@@ -166,9 +181,9 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Install Ubuntu Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get -y install cmake libargtable2-dev libcunit1-dev libsdl2-mixer-dev \
+      uses: Eeems-Org/apt-cache-action@v1.3
+      with:
+        packages: cmake libargtable2-dev libcunit1-dev libsdl2-mixer-dev
           libconfuse-dev libenet-dev libsdl2-dev libxmp-dev libpng-dev libepoxy-dev
 
     - name: Generate Release
@@ -237,7 +252,7 @@ jobs:
   # Build macos package, release artifact
   # -----------------------------------------------------------------------------------------------
   build_macos-arm:
-    needs: [unittest, formatting-check]
+    needs: [unittest, formatting-check, cmake-formatting-check]
 
     name: Build macos-14
     runs-on: macos-14
@@ -297,7 +312,7 @@ jobs:
   # Build windows package, release artifact (mingw-w64)
   # -----------------------------------------------------------------------------------------------
   build_windows:
-    needs: [unittest, formatting-check]
+    needs: [unittest, formatting-check, cmake-formatting-check]
 
     name: Build windows-amd64 (mingw-w64)
     runs-on: ubuntu-latest
@@ -305,10 +320,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Install apt Dependencies
+      uses: Eeems-Org/apt-cache-action@v1.3
+      with:
+        packages: mingw-w64 unzip
     - name: Install Dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get -y install mingw-w64 unzip
         wget -q https://github.com/omf2097/openomf-win-build/archive/refs/heads/main.zip
         unzip -q main.zip && rm main.zip
 
