@@ -36,7 +36,8 @@ enum
 enum
 {
     LANG2_STR_LANGUAGE,
-    LANG2_STR_COUNT
+    // XXX TODO: Magnus: fill out LANG2_STR enum
+    LANG2_STR_COUNT = 66
 };
 
 // Gets an OMF 2097 localization string

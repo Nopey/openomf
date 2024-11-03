@@ -30,13 +30,26 @@ noreturn void error_exit(const char *message, int line_number) {
     exit(EXIT_FAILURE);
 }
 
-static char *lang_nextline(char *line, size_t sizeof_line, FILE *file, int *line_number) {
+typedef enum
+{
+    skip_empty,
+    no_skip,
+} enum_skip_empty;
+
+static char *lang_nextline(char *line, size_t sizeof_line, FILE *file, int *line_number, enum_skip_empty should_skip) {
     assert(sizeof_line > 1);
     while(true) {
         (*line_number)++;
         char *read_line = fgets(line, sizeof_line, file);
-        if(read_line && *read_line == '#') {
+        if(!read_line) {
+            // always return on EOF
+            return read_line;
+        }
+        if(*read_line == '#') {
             // skip comments
+            continue;
+        }
+        if(should_skip == skip_empty && (*read_line == '\n' || *read_line == '\0')) {
             continue;
         }
         return read_line;
@@ -79,9 +92,9 @@ char *extract_value(char *line, const char *field_name, int line_number, bool al
     return line;
 }
 
-int read_entry(FILE *file, sd_language *language, int *line_number) {
+int read_entry(FILE *file, sd_language *language, sd_language const *base_language, int *line_number) {
     char line[MAX_LINE];
-    if(!lang_nextline(line, sizeof(line), file, line_number)) {
+    if(!lang_nextline(line, sizeof(line), file, line_number, skip_empty)) {
         // EOF is ok here
         return 0;
     }
@@ -105,7 +118,7 @@ int read_entry(FILE *file, sd_language *language, int *line_number) {
         error_exit(error, *line_number);
     }
 
-    if(!lang_nextline(line, sizeof(line), file, line_number)) {
+    if(!lang_nextline(line, sizeof(line), file, line_number, no_skip)) {
         error_exit("Unexpected EOF while reading Title", *line_number);
     }
 
@@ -113,13 +126,73 @@ int read_entry(FILE *file, sd_language *language, int *line_number) {
     str_from_c(&desc, extract_value(line, "Title", *line_number, true));
     str_strip(&desc);
 
+    size_t max_desc_len = MAX_TITLE - 1;
+    if(str_size(&desc) > max_desc_len) {
+        fprintf(stderr, "Warning: truncating overlong 'Title:' of entry id %d. Length is %zu, max length is %zu\n",
+                language->count, str_size(&desc), max_desc_len);
+        str trunc;
+        str_from_buf(&trunc, str_c(&desc), max_desc_len);
+        str_free(&desc);
+        desc = trunc;
+    }
+
     // Read Data header
-    if(!lang_nextline(line, sizeof(line), file, line_number)) {
+    if(!lang_nextline(line, sizeof(line), file, line_number, no_skip)) {
         error_exit("Unexpected EOF while reading Data", *line_number);
     }
 
-    if(strncmp(line, "Data:", 5) != 0) {
-        error_exit("Expected 'Data:' field", *line_number);
+    if(strncmp(line, "CopyBase:", 5) == 0) {
+        if(base_language->count == 0) {
+            error_exit("CopyBase used, but no base language loaded!", *line_number);
+        }
+        char *value = extract_value(line, "CopyBase", *line_number, true);
+        char *range_separator;
+        long range_start, range_end;
+        str baseid;
+        if((range_separator = strstr(value, "..="))) {
+            *range_separator = '\0';
+            char *cstr_range_end = range_separator + 3;
+
+            str_from_c(&baseid, value);
+            str_strip(&baseid);
+            if(!str_to_long(&baseid, &range_start) || range_start > (long)base_language->count || range_start < 0) {
+                str err;
+                str_from_format(&err, "CopyBase range must start with a valid ID within limits 0..=%u, found '%s'\n",
+                                base_language->count - 1, str_c(&baseid));
+                error_exit(str_c(&err), *line_number);
+            }
+            str_free(&baseid);
+
+            str_from_c(&baseid, cstr_range_end);
+            str_strip(&baseid);
+            if(!str_to_long(&baseid, &range_end) || range_end > (long)base_language->count || range_end < 0) {
+                str err;
+                str_from_format(&err, "CopyBase range must end with a valid ID within limits 0..=%u, found '%s'\n",
+                                base_language->count - 1, str_c(&baseid));
+                error_exit(str_c(&err), *line_number);
+            }
+            str_free(&baseid);
+        } else {
+            str_from_c(&baseid, value);
+            str_strip(&baseid);
+            if(!str_to_long(&baseid, &range_start) || range_start > (long)base_language->count || range_start < 0) {
+                str err;
+                str_from_format(&err, "CopyBase must specify a valid ID or range within limits 0..=%u, found '%s'\n",
+                                base_language->count - 1, str_c(&baseid));
+                error_exit(str_c(&err), *line_number);
+            }
+            str_free(&baseid);
+
+            // range contains a single idx
+            range_end = range_start;
+        }
+
+        for(long from_id = range_start; from_id <= range_end; from_id++) {
+            sd_lang_string const *from = &base_language->strings[(unsigned int)from_id];
+            sd_language_append(language, str_c(&desc), from->data);
+        }
+        str_free(&desc);
+        return 1;
     }
 
     char *data = malloc(8192);
@@ -135,7 +208,7 @@ int read_entry(FILE *file, sd_language *language, int *line_number) {
     data_iter += value_len;
 
     // Read data body until next entry or EOF
-    while(lang_nextline(line, sizeof(line), file, line_number)) {
+    while(lang_nextline(line, sizeof(line), file, line_number, no_skip)) {
         // Check if this is the start of a new entry
         if(strncmp(line, "ID:", 3) == 0) {
             // Rewind to start of this line
@@ -158,15 +231,6 @@ int read_entry(FILE *file, sd_language *language, int *line_number) {
         data_iter[-1] = '\0';
     }
 
-    size_t max_desc_len = MAX_TITLE - 1;
-    if(str_size(&desc) > max_desc_len) {
-        fprintf(stderr, "Warning: truncating overlong 'Title:' of entry id %d. Length is %zu, max length is %zu\n",
-                language->count, str_size(&desc), max_desc_len);
-        str trunc;
-        str_from_buf(&trunc, str_c(&desc), max_desc_len);
-        str_free(&desc);
-        desc = trunc;
-    }
     sd_language_append(language, str_c(&desc), data);
     free(data);
     str_free(&desc);
@@ -175,13 +239,13 @@ int read_entry(FILE *file, sd_language *language, int *line_number) {
 
 typedef struct conversion_result {
     cp437_result error_code;
-    int string_index;
+    unsigned int string_index;
 } conversion_result;
 
 static conversion_result sd_language_to_utf8(sd_language *language) {
     assert(language);
     conversion_result result;
-    for(size_t idx = 0; idx < language->count; idx++) {
+    for(unsigned int idx = 0; idx < language->count; idx++) {
         result.string_index = idx;
         char *old_data = language->strings[idx].data;
         size_t sizeof_old_data = strlen(old_data) + 1;
@@ -273,17 +337,23 @@ int main(int argc, char *argv[]) {
     struct arg_lit *vers = arg_lit0("v", "version", "print version information and exit");
     struct arg_file *file = arg_file0("f", "file", "<file>", "load OMF language file");
     struct arg_file *input = arg_file0("i", "import", "<file>", "import UTF-8 .TXT file");
+    struct arg_file *base = arg_file0("b", "base", "<file>", "load OMF language file as BASE");
     struct arg_int *str = arg_int0("s", "string", "<value>", "display language string number");
     struct arg_file *output = arg_file0("o", "output", "<file>", "compile output language file");
     struct arg_int *check_count =
         arg_int0("c", "check-count", "<NUM>", "Check that language file has this many entries, or bail.");
     struct arg_end *end = arg_end(20);
-    void *argtable[] = {help, vers, file, input, output, str, check_count, end};
+    void *argtable[] = {help, vers, file, input, base, output, str, check_count, end};
     const char *progname = "languagetool";
 
     bool language_is_utf8 = false;
     sd_language language;
     sd_language_create(&language);
+
+    bool base_language_is_utf8 = false;
+    sd_language base_language;
+    sd_language_create(&base_language);
+
     // assume failure until success happens.
     int main_ret = EXIT_FAILURE;
 
@@ -321,9 +391,25 @@ int main(int argc, char *argv[]) {
         goto exit_0;
     }
 
-    // Get strings
+    if(file->count + input->count > 1) {
+        fprintf(stderr, "Too many inputs provided! please supply one --file or --import argument.\n");
+        goto exit_0;
+    } else if(file->count + input->count < 1) {
+        fprintf(stderr, "Not enough inputs provided! please supply one --file or --import argument.\n");
+        goto exit_0;
+    }
+
+    if(base->count > 0 && input->count == 0) {
+        fprintf(stderr, "Unexpected --base argument: it is meaningless without --import.\n");
+        goto exit_0;
+    } else if(base->count > 1) {
+        fprintf(stderr, "Too many --base arguments: please supply only one.\n");
+        goto exit_0;
+    }
+
     int ret;
 
+    // Get strings from binary lang file
     if(file->count > 0) {
         ret = sd_language_load(&language, file->filename[0]);
         language_is_utf8 = false;
@@ -331,7 +417,20 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "Language file could not be loaded! Error [%d] %s\n", ret, sd_get_error(ret));
             goto exit_0;
         }
-    } else if(input->count > 0) {
+    }
+
+    // Get strings from base lang file
+    if(base->count > 0) {
+        ret = sd_language_load(&base_language, base->filename[0]);
+        base_language_is_utf8 = false;
+        if(ret != SD_SUCCESS) {
+            fprintf(stderr, "Base language file could not be loaded! Error [%d] %s\n", ret, sd_get_error(ret));
+            goto exit_0;
+        }
+    }
+
+    // Import TXT file
+    if(input->count > 0) {
         char const *expected_ext = ".TXT";
         if(!input->extension[0] || strcmp(input->extension[0], expected_ext) != 0) {
             fprintf(stderr, "Refusing to open input file %s, does not have expected %s file extension.\n",
@@ -344,14 +443,23 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "Could not open %s\n", input->filename[0]);
             goto exit_0;
         }
+
+        if(!base_language_is_utf8) {
+            conversion_result result = sd_language_to_utf8(&base_language);
+            if(result.error_code != CP437_SUCCESS) {
+                fprintf(stderr, "Error converting base language '%s' to UTF-8! Error %s on language entry %u\n",
+                        base->filename[0], cp437_result_to_string(result.error_code), result.string_index);
+                goto exit_0;
+            }
+            base_language_is_utf8 = true;
+        }
+
         // line is incremented prior to parsing each line
         int line = 0;
         language_is_utf8 = true;
-        while(read_entry(file, &language, &line)) {
+        assert(base_language_is_utf8 == language_is_utf8);
+        while(read_entry(file, &language, &base_language, &line)) {
         }
-    } else {
-        fprintf(stderr, "Please supply -f or -i\n");
-        goto exit_0;
     }
 
     if(check_count->count > 0 && (unsigned)check_count->ival[0] != language.count) {
@@ -365,7 +473,7 @@ int main(int argc, char *argv[]) {
         if(!language_is_utf8) {
             conversion_result result = sd_language_to_utf8(&language);
             if(result.error_code != CP437_SUCCESS) {
-                fprintf(stderr, "Error converting to UTF-8! Error %s on language entry %d\n",
+                fprintf(stderr, "Error converting to UTF-8! Error %s on language entry %u\n",
                         cp437_result_to_string(result.error_code), result.string_index);
                 goto exit_0;
             }
@@ -384,7 +492,7 @@ int main(int argc, char *argv[]) {
         if(!language_is_utf8) {
             conversion_result result = sd_language_to_utf8(&language);
             if(result.error_code != CP437_SUCCESS) {
-                fprintf(stderr, "Error converting to UTF-8! Error %s on language entry %d\n",
+                fprintf(stderr, "Error converting to UTF-8! Error %s on language entry %u\n",
                         cp437_result_to_string(result.error_code), result.string_index);
                 goto exit_0;
             }
@@ -418,7 +526,7 @@ int main(int argc, char *argv[]) {
         if(language_is_utf8) {
             conversion_result result = sd_language_from_utf8(&language);
             if(result.error_code != CP437_SUCCESS) {
-                fprintf(stderr, "Error converting from UTF-8! Error %s on language entry %d\n",
+                fprintf(stderr, "Error converting from UTF-8! Error %s on language entry %u\n",
                         cp437_result_to_string(result.error_code), result.string_index);
                 goto exit_0;
             }
