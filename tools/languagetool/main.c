@@ -6,6 +6,7 @@
 
 #include "formats/error.h"
 #include "formats/language.h"
+#include "resources/languages.h"
 #include "utils/allocator.h"
 #include "utils/cp437.h"
 #include "utils/str.h"
@@ -332,19 +333,16 @@ static conversion_result sd_language_from_utf8(sd_language *language) {
 }
 
 static void fix_old_language(sd_language *language, unsigned int desired_count) {
-    // OMF 2097 v2.1 (Epic Challenge Arena) ENGLISH.DAT
-    unsigned int const new_language_count = 1013;
-    // OMF GERMAN.DAT and old versions of ENGLISH.DAT have only 990 strings
-    unsigned int const old_language_count = 990;
-
-    if(desired_count == new_language_count && language->count == old_language_count) {
+    if(desired_count == LANG_STR_COUNT && language->count == OLD_LANG_STR_COUNT) {
         // OMF 2.1 added netplay, and with it 23 new localization strings
         unsigned new_ids[] = {149, 150, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181,
                               182, 183, 184, 185, 267, 269, 270, 271, 284, 295, 305};
+        static_assert((sizeof(new_ids) / sizeof(new_ids[0])) == LANG_STR_COUNT - OLD_LANG_STR_COUNT,
+                      "new_ids should pad OLD_LANG_STR_COUNT to (NEW) LANG_STR_COUNT");
         unsigned *new_ids_end = new_ids + sizeof(new_ids) / sizeof(new_ids[0]);
 
         // insert dummy entries
-        sd_lang_string *expanded_strings = omf_malloc(new_language_count * sizeof(sd_lang_string));
+        sd_lang_string *expanded_strings = omf_malloc(LANG_STR_COUNT * sizeof(sd_lang_string));
         unsigned next = 0;
         unsigned next_from = 0;
         for(unsigned *id = new_ids; id < new_ids_end; id++) {
@@ -360,10 +358,9 @@ static void fix_old_language(sd_language *language, unsigned int desired_count) 
             language->count++;
         }
         memcpy(expanded_strings + next, language->strings + next_from,
-               (new_language_count - next) * sizeof(sd_lang_string));
+               (LANG_STR_COUNT - next) * sizeof(sd_lang_string));
         omf_free(language->strings);
         language->strings = expanded_strings;
-        assert(language->count == new_language_count);
     }
 }
 

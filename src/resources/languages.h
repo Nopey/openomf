@@ -29,6 +29,13 @@ enum
     LANG_STR_COUNT = 1013,
 };
 
+enum
+{
+    // OMF versions before 2.1 shipped 990 strings.
+    // (GERMAN.DAT, and old ENGLISH.DAT have this many strings)
+    OLD_LANG_STR_COUNT = 990,
+};
+
 /*! \brief OpenOMF String ID
  *
  * These string IDs should match BuildLanguages.cmake, BASE.TXT, and the various ${LANG}2.TXT files
