@@ -6,6 +6,7 @@
 #include "utils/allocator.h"
 #include "utils/log.h"
 #include "utils/str.h"
+#include <assert.h>
 #include <string.h>
 
 static sd_language *language;
@@ -109,17 +110,16 @@ void lang_close(void) {
 }
 
 const char *lang_get(unsigned int id) {
-    if(id > language->count || !language->strings[id].data) {
-        PERROR("unsupported lang id %u!", id);
-        return "!INVALID!";
-    }
+    assert(id < language->count && language->strings[id].data != NULL);
     return language->strings[id].data;
 }
 
 const char *lang_get2(unsigned int id) {
-    if(id > language2->count || !language2->strings[id].data) {
-        PERROR("unsupported lang2 id %u!", id);
-        return "!INVALID2!";
-    }
+    assert(id < language2->count && language2->strings[id].data != NULL);
     return language2->strings[id].data;
+}
+
+const char *lang_get2_offset_impl(unsigned int id, unsigned int count, unsigned int offset) {
+    assert(offset <= count);
+    return lang_get2(id + offset);
 }

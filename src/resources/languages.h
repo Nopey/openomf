@@ -13,25 +13,12 @@
 bool lang_init(void);
 void lang_close(void);
 
-/*! \brief OMF 2097 String ID
- *
- * These string IDs match OMFv2.1 (Epic Challenge Arena)
- */
 enum
 {
-    // there are 10 HARs
-    LANG_STR_HAR = 31,
-    LANG_STR_NEWSROOM_NEWCHAMPION = 79,
-    // there are 3*2 pronouns
-    LANG_STR_PRONOUN = 81,
-    // there are 24*2 newsroom texts
-    LANG_STR_NEWSROOM_TEXT = 87,
-
+    // OMFv2.1 (Epic Challenge Arena) ships 1013 strings.
+    // (latest official ENGLISH.DAT has this many strings)
     LANG_STR_COUNT = 1013,
-};
 
-enum
-{
     // OMF versions before 2.1 shipped 990 strings.
     // (GERMAN.DAT, and old ENGLISH.DAT have this many strings)
     OLD_LANG_STR_COUNT = 990,
@@ -41,5 +28,9 @@ enum
 const char *lang_get(unsigned int id);
 // Gets an openomf localization string
 const char *lang_get2(unsigned int id);
+
+// Gets an openomf localization string (from one of the tables)
+#define lang_get2_offset(LANG2_STR, offset) lang_get2_offset_impl(LANG2_STR, LANG2_STR##_COUNT, (offset))
+const char *lang_get2_offset_impl(unsigned int id, unsigned int count, unsigned int offset);
 
 #endif // LANGUAGES_H
