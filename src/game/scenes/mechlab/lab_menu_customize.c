@@ -416,9 +416,9 @@ void lab_menu_focus_blue(component *c, bool focused, void *userdata) {
     if(focused) {
         scene *s = userdata;
         if(mechlab_get_selling(s)) {
-            mechlab_set_hint(s, lang_get(547));
+            mechlab_set_hint(s, lang_get2(LANG2_STR_CUSTOMIZE_COLOR_1));
         } else {
-            mechlab_set_hint(s, lang_get(548));
+            mechlab_set_hint(s, lang_get2(LANG2_STR_CUSTOMIZE_COLOR_1));
         }
         label_set_text(header_label, "");
         label_set_text(details_label, "");
@@ -429,9 +429,9 @@ void lab_menu_focus_yellow(component *c, bool focused, void *userdata) {
     if(focused) {
         scene *s = userdata;
         if(mechlab_get_selling(s)) {
-            mechlab_set_hint(s, lang_get(551));
+            mechlab_set_hint(s, lang_get2(LANG2_STR_CUSTOMIZE_COLOR_2));
         } else {
-            mechlab_set_hint(s, lang_get(552));
+            mechlab_set_hint(s, lang_get2(LANG2_STR_CUSTOMIZE_COLOR_2));
         }
         label_set_text(header_label, "");
         label_set_text(details_label, "");
@@ -442,9 +442,9 @@ void lab_menu_focus_red(component *c, bool focused, void *userdata) {
     if(focused) {
         scene *s = userdata;
         if(mechlab_get_selling(s)) {
-            mechlab_set_hint(s, lang_get(549));
+            mechlab_set_hint(s, lang_get2(LANG2_STR_CUSTOMIZE_COLOR_3));
         } else {
-            mechlab_set_hint(s, lang_get(550));
+            mechlab_set_hint(s, lang_get2(LANG2_STR_CUSTOMIZE_COLOR_3));
         }
         label_set_text(header_label, "");
         label_set_text(details_label, "");
@@ -468,7 +468,7 @@ static void lab_menu_focus_arm_power(component *c, bool focused, void *userdata)
                 snprintf(tmp, sizeof(tmp), "Level %d\n\n$ %sK", pilot->arm_power, price_str);
                 label_set_text(details_label, tmp);
             }
-            snprintf(tmp, sizeof(tmp), lang_get(553), "arm");
+            snprintf(tmp, sizeof(tmp), lang_get2(LANG2_STR_UPGRADE_POWER_SELL), "arm");
             mechlab_set_hint(s, tmp);
         } else {
             label_set_text(header_label, "ARM POWER:\n\nUPGRADE COST:");
@@ -481,7 +481,7 @@ static void lab_menu_focus_arm_power(component *c, bool focused, void *userdata)
                 snprintf(tmp, sizeof(tmp), "Level %d\n\n$ %sK", pilot->arm_power + 1, price_str);
                 label_set_text(details_label, tmp);
             }
-            snprintf(tmp, sizeof(tmp), lang_get(554), "arm");
+            snprintf(tmp, sizeof(tmp), lang_get2(LANG2_STR_UPGRADE_POWER_BUY), "arm");
             mechlab_set_hint(s, tmp);
         }
     }
@@ -504,7 +504,7 @@ static void lab_menu_focus_leg_power(component *c, bool focused, void *userdata)
                 snprintf(tmp, sizeof(tmp), "Level %d\n\n$ %sK", pilot->leg_power, price_str);
                 label_set_text(details_label, tmp);
             }
-            snprintf(tmp, sizeof(tmp), lang_get(555), "leg");
+            snprintf(tmp, sizeof(tmp), lang_get2(LANG2_STR_UPGRADE_POWER_SELL), "leg");
             mechlab_set_hint(s, tmp);
         } else {
             label_set_text(header_label, "LEG POWER:\n\nUPGRADE COST:");
@@ -517,7 +517,7 @@ static void lab_menu_focus_leg_power(component *c, bool focused, void *userdata)
                 snprintf(tmp, sizeof(tmp), "Level %d\n\n$ %sK", pilot->leg_power + 1, price_str);
                 label_set_text(details_label, tmp);
             }
-            snprintf(tmp, sizeof(tmp), lang_get(556), "leg");
+            snprintf(tmp, sizeof(tmp), lang_get2(LANG2_STR_UPGRADE_POWER_BUY), "leg");
             mechlab_set_hint(s, tmp);
         }
     }
@@ -540,7 +540,7 @@ static void lab_menu_focus_arm_speed(component *c, bool focused, void *userdata)
                 snprintf(tmp, sizeof(tmp), "Level %d\n\n$ %sK", pilot->arm_speed, price_str);
                 label_set_text(details_label, tmp);
             }
-            snprintf(tmp, sizeof(tmp), lang_get(557), "arm");
+            snprintf(tmp, sizeof(tmp), lang_get2(LANG2_STR_UPGRADE_SPEED_SELL), "arm");
             mechlab_set_hint(s, tmp);
         } else {
             label_set_text(header_label, "ARM SPEED:\n\nUPGRADE COST:");
@@ -553,7 +553,7 @@ static void lab_menu_focus_arm_speed(component *c, bool focused, void *userdata)
                 snprintf(tmp, sizeof(tmp), "Level %d\n\n$ %sK", pilot->arm_speed + 1, price_str);
                 label_set_text(details_label, tmp);
             }
-            snprintf(tmp, sizeof(tmp), lang_get(558), "arm");
+            snprintf(tmp, sizeof(tmp), lang_get2(LANG2_STR_UPGRADE_SPEED_BUY), "arm");
             mechlab_set_hint(s, tmp);
         }
     }
@@ -576,7 +576,7 @@ static void lab_menu_focus_leg_speed(component *c, bool focused, void *userdata)
                 snprintf(tmp, sizeof(tmp), "Level %d\n\n$ %sK", pilot->leg_speed, price_str);
                 label_set_text(details_label, tmp);
             }
-            snprintf(tmp, sizeof(tmp), lang_get(559), "leg");
+            snprintf(tmp, sizeof(tmp), lang_get2(LANG2_STR_UPGRADE_SPEED_SELL), "leg");
             mechlab_set_hint(s, tmp);
         } else {
             label_set_text(header_label, "LEG SPEED:\n\nUPGRADE COST:");
@@ -589,7 +589,7 @@ static void lab_menu_focus_leg_speed(component *c, bool focused, void *userdata)
                 snprintf(tmp, sizeof(tmp), "Level %d\n\n$ %sK", pilot->leg_speed + 1, price_str);
                 label_set_text(details_label, tmp);
             }
-            snprintf(tmp, sizeof(tmp), lang_get(560), "leg");
+            snprintf(tmp, sizeof(tmp), lang_get2(LANG2_STR_UPGRADE_SPEED_BUY), "leg");
             mechlab_set_hint(s, tmp);
         }
     }
@@ -612,7 +612,7 @@ static void lab_menu_focus_armor(component *c, bool focused, void *userdata) {
                 snprintf(tmp, sizeof(tmp), "Level %d\n\n$ %sK", pilot->armor, price_str);
                 label_set_text(details_label, tmp);
             }
-            mechlab_set_hint(s, lang_get(561));
+            mechlab_set_hint(s, lang_get2(LANG2_STR_UPGRADE_ARMOR_SELL));
         } else {
             label_set_text(header_label, "ARMOR PLATE:\n\nUPGRADE COST:");
             int32_t price = armor_prices[pilot->har_id][pilot->armor + 1];
@@ -623,7 +623,7 @@ static void lab_menu_focus_armor(component *c, bool focused, void *userdata) {
                 snprintf(tmp, sizeof(tmp), "Level %d\n\n$ %sK", pilot->armor + 1, price_str);
                 label_set_text(details_label, tmp);
             }
-            mechlab_set_hint(s, lang_get(562));
+            mechlab_set_hint(s, lang_get2(LANG2_STR_UPGRADE_ARMOR_BUY));
         }
     }
 }
@@ -645,7 +645,7 @@ static void lab_menu_focus_stun_resistance(component *c, bool focused, void *use
                 snprintf(tmp, sizeof(tmp), "Level %d\n\n$ %sK", pilot->stun_resistance, price_str);
                 label_set_text(details_label, tmp);
             }
-            mechlab_set_hint(s, lang_get(563));
+            mechlab_set_hint(s, lang_get2(LANG2_STR_UPGRADE_STUNRESISTANCE_SELL));
         } else {
             label_set_text(header_label, "STUN RES.:\n\nUPGRADE COST:");
             int32_t price = stun_resistance_prices[pilot->har_id][pilot->stun_resistance + 1];
@@ -656,7 +656,7 @@ static void lab_menu_focus_stun_resistance(component *c, bool focused, void *use
                 snprintf(tmp, sizeof(tmp), "Level %d\n\n$ %sK", pilot->stun_resistance + 1, price_str);
                 label_set_text(details_label, tmp);
             }
-            mechlab_set_hint(s, lang_get(564));
+            mechlab_set_hint(s, lang_get2(LANG2_STR_UPGRADE_STUNRESISTANCE_BUY));
         }
     }
 }
@@ -665,7 +665,7 @@ void lab_menu_focus_trade(component *c, bool focused, void *userdata) {
     if(focused) {
         scene *s = userdata;
         game_player *p1 = game_state_get_player(s->gs, 0);
-        mechlab_set_hint(s, lang_get(565));
+        mechlab_set_hint(s, lang_get2(LANG2_STR_TRADE_HELP));
         int trade_value = calculate_trade_value(p1->pilot);
         uint8_t trades[5];
         memset(trades, 0, sizeof(trades));
@@ -683,26 +683,29 @@ void lab_menu_focus_trade(component *c, bool focused, void *userdata) {
         DEBUG("got %d trades from the bitmask %d", tradecount, p1->pilot->har_trades);
         // check if there's anything for trade
         if(tradecount == 0) {
-            label_set_text(header_label, lang_get(488));
+            label_set_text(header_label, lang_get2(LANG2_STR_TRADE_NONEAVAILABLE));
             label_set_text(details_label, "");
         } else {
-            label_set_text(header_label, lang_get(461));
+            label_set_text(header_label, lang_get2(LANG2_STR_TRADE_AVAILABLE));
             char tmp[200] = "";
             // pick 5 of however many we got
             // naturally, I unrolled this loop for performance
             if(tradecount == 1) {
-                snprintf(tmp, 200, "%s", lang_get(31 + trades[0]));
+                snprintf(tmp, 200, "%s", lang_get2_offset(LANG2_STR_ROBOT, trades[0]));
             } else if(tradecount == 2) {
-                snprintf(tmp, 200, "%s %s", lang_get(31 + trades[0]), lang_get(31 + trades[1]));
+                snprintf(tmp, 200, "%s %s", lang_get2_offset(LANG2_STR_ROBOT, trades[0]),
+                         lang_get2_offset(LANG2_STR_ROBOT, trades[1]));
             } else if(tradecount == 3) {
-                snprintf(tmp, 200, "%s %s %s", lang_get(31 + trades[0]), lang_get(31 + trades[1]),
-                         lang_get(31 + trades[2]));
+                snprintf(tmp, 200, "%s %s %s", lang_get2_offset(LANG2_STR_ROBOT, trades[0]),
+                         lang_get2_offset(LANG2_STR_ROBOT, trades[1]), lang_get2_offset(LANG2_STR_ROBOT, trades[2]));
             } else if(tradecount == 4) {
-                snprintf(tmp, 200, "%s %s %s %s", lang_get(31 + trades[0]), lang_get(31 + trades[1]),
-                         lang_get(31 + trades[2]), lang_get(31 + trades[3]));
+                snprintf(tmp, 200, "%s %s %s %s", lang_get2_offset(LANG2_STR_ROBOT, trades[0]),
+                         lang_get2_offset(LANG2_STR_ROBOT, trades[1]), lang_get2_offset(LANG2_STR_ROBOT, trades[2]),
+                         lang_get2_offset(LANG2_STR_ROBOT, trades[3]));
             } else if(tradecount == 5) {
-                snprintf(tmp, 200, "%s %s %s %s %s", lang_get(31 + trades[0]), lang_get(31 + trades[1]),
-                         lang_get(31 + trades[2]), lang_get(31 + trades[3]), lang_get(31 + trades[4]));
+                snprintf(tmp, 200, "%s %s %s %s %s", lang_get2_offset(LANG2_STR_ROBOT, trades[0]),
+                         lang_get2_offset(LANG2_STR_ROBOT, trades[1]), lang_get2_offset(LANG2_STR_ROBOT, trades[2]),
+                         lang_get2_offset(LANG2_STR_ROBOT, trades[3]), lang_get2_offset(LANG2_STR_ROBOT, trades[4]));
             }
             label_set_text(details_label, tmp);
         }
@@ -713,9 +716,9 @@ void lab_menu_focus_done(component *c, bool focused, void *userdata) {
     if(focused) {
         scene *s = userdata;
         if(mechlab_get_selling(s)) {
-            mechlab_set_hint(s, lang_get(567));
+            mechlab_set_hint(s, lang_get2(LANG2_STR_UPGRADE_QUIT_SELL));
         } else {
-            mechlab_set_hint(s, lang_get(568));
+            mechlab_set_hint(s, lang_get2(LANG2_STR_UPGRADE_QUIT_BUY));
         }
         label_set_text(header_label, "");
         label_set_text(details_label, "");

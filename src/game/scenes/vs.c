@@ -282,16 +282,17 @@ void vs_render(scene *scene) {
         video_draw(&local->arena_select_bg, 55, 150);
 
         // arena name
-        text_render(&tconf_green, TEXT_DEFAULT, 56 + 72, 152, (211 - 72), 8, lang_get(56 + local->arena));
+        text_render(&tconf_green, TEXT_DEFAULT, 56 + 72, 152, (211 - 72), 8,
+                    lang_get2_offset(LANG2_STR_ARENA, local->arena));
 
         tconf_green.valign = TEXT_MIDDLE;
         // arena description
-        text_render(&tconf_green, TEXT_DEFAULT, 56 + 72, 153, (211 - 72), 50, lang_get(66 + local->arena));
+        text_render(&tconf_green, TEXT_DEFAULT, 56 + 72, 153, (211 - 72), 50,
+                    lang_get2_offset(LANG2_STR_ARENADESCRIPTION, local->arena));
     } else if(player2->pilot && player2->pilot->pilot_id == PILOT_KREISSACK &&
-              settings_get()->gameplay.difficulty < 2) {
-        // kreissack, but not on Veteran or higher
+              settings_get()->gameplay.difficulty < VETERAN) {
         tconf_yellow.halign = TEXT_CENTER;
-        text_render(&tconf_yellow, TEXT_DEFAULT, 80, 165, 170, 60, lang_get(747));
+        text_render(&tconf_yellow, TEXT_DEFAULT, 80, 165, 170, 60, lang_get2(LANG2_STR_TOOPATHETIC_INSULT));
 
     } else if(player1->chr && player2->pilot) {
         // tournament mode insult
@@ -312,7 +313,7 @@ void vs_render(scene *scene) {
         char text[256];
         char money[16];
         fight_stats *fight_stats = &scene->gs->fight_stats;
-        snprintf(text, sizeof(text), lang_get(fight_stats->plug_text + PLUG_TEXT_START), fight_stats->sold);
+        snprintf(text, sizeof(text), lang_get2_offset(LANG2_STR_PLUG, fight_stats->plug_text), fight_stats->sold);
         text_render(&tconf_yellow, TEXT_DEFAULT, 90, 156, 198, 6, text);
 
         text_render(&light_green, TEXT_DEFAULT, 190, 6, 140, 6, "FINANCIAL REPORT");
@@ -376,10 +377,12 @@ void vs_render(scene *scene) {
         // 1 player insult
         tconf_yellow.valign = TEXT_MIDDLE;
         tconf_yellow.halign = TEXT_CENTER;
-        text_render(&tconf_yellow, TEXT_DEFAULT, 77, 150, 150, 30,
-                    lang_get(749 + (11 * player1->pilot->pilot_id) + player2->pilot->pilot_id));
-        text_render(&tconf_yellow, TEXT_DEFAULT, 110, 170, 150, 30,
-                    lang_get(870 + (11 * player2->pilot->pilot_id) + player1->pilot->pilot_id));
+        text_render(
+            &tconf_yellow, TEXT_DEFAULT, 77, 150, 150, 30,
+            lang_get2_offset(LANG2_STR_VS_INSULT_1, (11 * player1->pilot->pilot_id) + player2->pilot->pilot_id));
+        text_render(
+            &tconf_yellow, TEXT_DEFAULT, 110, 170, 150, 30,
+            lang_get2_offset(LANG2_STR_VS_INSULT_2, (11 * player2->pilot->pilot_id) + player1->pilot->pilot_id));
     }
 }
 
@@ -455,8 +458,9 @@ int vs_create(scene *scene) {
     } else if(player1->chr) {
         snprintf(local->vs_str, 128, "%s VS. %s", player1->chr->pilot.name, player2->pilot->name);
     } else {
-        const char *pilot1 = lang_get(20 + player1->pilot->pilot_id);
-        const char *pilot2 = lang_get(20 + player2->pilot->pilot_id);
+        const char *pilot1 = lang_get2_offset(LANG2_STR_PILOT, player1->pilot->pilot_id);
+        const char *pilot2 = lang_get2_offset(LANG2_STR_PILOT, player2->pilot->pilot_id);
+        // XXX TODO: Magnus: hardcoded -1's to compensate for OMF 2097 lang trailing newlines
         snprintf(local->vs_str, 128, "%*.*s VS. %*.*s", (int)strlen(pilot1) - 1, (int)strlen(pilot1) - 1, pilot1,
                  (int)strlen(pilot2) - 1, (int)strlen(pilot2) - 1, pilot2);
     }
@@ -645,9 +649,9 @@ int vs_create(scene *scene) {
     // Too Pathetic Dialog
 
     str insult;
-    str_from_c(&insult, lang_get(748));
-    str_replace(&insult, "%s", lang_get(345), 1);
-    str_replace(&insult, "%s", lang_get(30), 1);
+    str_from_c(&insult, lang_get2(LANG2_STR_TOOPATHETIC_DIALOG));
+    str_replace(&insult, "%s", lang_get2_offset(LANG2_STR_CPU_DIFFICULTY, VETERAN), 1);
+    str_replace(&insult, "%s", lang_get2_offset(LANG2_STR_PILOT, PILOT_KREISSACK), 1);
     // XXX HACK: Remove newline after kreissack's name until we clean up our string tables
     str_replace(&insult, "\n.", ".", -1);
     dialog_create(&local->too_pathetic_dialog, DIALOG_STYLE_OK, str_c(&insult), 40, 40);

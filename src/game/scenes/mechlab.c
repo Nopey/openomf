@@ -145,8 +145,9 @@ void mechlab_free(scene *scene) {
 
 void mechlab_enter_trnselect_menu(scene *scene) {
     mechlab_local *local = scene_get_userdata(scene);
-    component *menu = lab_menu_select_create(scene, lab_dash_trnselect_select, &local->tw, lab_dash_trnselect_left,
-                                             &local->tw, lab_dash_trnselect_right, &local->tw, lang_get(486), true);
+    component *menu =
+        lab_menu_select_create(scene, lab_dash_trnselect_select, &local->tw, lab_dash_trnselect_left, &local->tw,
+                               lab_dash_trnselect_right, &local->tw, lang_get2(LANG2_STR_SELECT_TOURNAMENT), true);
     guiframe_set_root(local->frame, menu);
     guiframe_layout(local->frame);
 }
@@ -154,7 +155,8 @@ void mechlab_enter_trnselect_menu(scene *scene) {
 component *mechlab_chrload_menu_create(scene *scene) {
     mechlab_local *local = scene_get_userdata(scene);
     component *menu = lab_menu_select_create(scene, lab_dash_main_chr_load, &local->dw, lab_dash_main_chr_left,
-                                             &local->dw, lab_dash_main_chr_right, &local->dw, lang_get(225), true);
+                                             &local->dw, lab_dash_main_chr_right, &local->dw,
+                                             lang_get2(LANG2_STR_SELECT_CHARACTER_TO_LOAD), true);
     trnmenu_set_submenu_init_cb(menu, lab_dash_main_chr_init);
     trnmenu_set_submenu_done_cb(menu, lab_dash_main_chr_done);
     trnmenu_set_userdata(menu, &local->dw);
@@ -164,7 +166,8 @@ component *mechlab_chrload_menu_create(scene *scene) {
 component *mechlab_chrdelete_menu_create(scene *scene) {
     mechlab_local *local = scene_get_userdata(scene);
     component *menu = lab_menu_select_create(scene, lab_dash_main_chr_delete, &local->dw, lab_dash_main_chr_left,
-                                             &local->dw, lab_dash_main_chr_right, &local->dw, lang_get(226), true);
+                                             &local->dw, lab_dash_main_chr_right, &local->dw,
+                                             lang_get2(LANG2_STR_SELECT_CHARACTER_TO_DELETE), true);
     trnmenu_set_submenu_init_cb(menu, lab_dash_main_chr_init);
     trnmenu_set_submenu_done_cb(menu, lab_dash_main_chr_done);
     trnmenu_set_userdata(menu, &local->dw);
@@ -173,8 +176,9 @@ component *mechlab_chrdelete_menu_create(scene *scene) {
 
 component *mechlab_sim_menu_create(scene *scene) {
     mechlab_local *local = scene_get_userdata(scene);
-    component *menu = lab_menu_select_create(scene, lab_dash_main_chr_delete, &local->dw, lab_dash_sim_left, &local->dw,
-                                             lab_dash_sim_right, &local->dw, lang_get(227), true);
+    component *menu =
+        lab_menu_select_create(scene, lab_dash_main_chr_delete, &local->dw, lab_dash_sim_left, &local->dw,
+                               lab_dash_sim_right, &local->dw, lang_get2(LANG2_STR_SELECT_OPPONENT), true);
     trnmenu_set_submenu_init_cb(menu, lab_dash_sim_init);
     trnmenu_set_submenu_done_cb(menu, lab_dash_sim_done);
     trnmenu_set_userdata(menu, &local->dw);
@@ -211,7 +215,8 @@ void mechlab_tick(scene *scene, int paused) {
         game_player *player1 = game_state_get_player(scene->gs, 0);
         if(local->dashtype == DASHBOARD_NEW_PLAYER) {
             char select_photo[64];
-            snprintf(select_photo, sizeof(select_photo), lang_get(224), player1->pilot->name);
+            snprintf(select_photo, sizeof(select_photo), lang_get2(LANG2_STR_SELECT_PHOTO_FOR_CHARACTER),
+                     player1->pilot->name);
             mechlab_select_dashboard(scene, DASHBOARD_SELECT_NEW_PIC);
             guiframe_free(local->frame);
             local->frame = guiframe_create(0, 0, 320, 200);

@@ -60,17 +60,21 @@ void lab_menu_trade(component *c, void *userdata) {
     int trade_value = calculate_trade_value(&p1->chr->pilot);
     int har_value = har_price(p1->pilot->har_id);
     if(trade_value == har_value) {
-        snprintf(tmp, 100, lang_get(520), lang_get(31 + p1->chr->pilot.har_id), lang_get(31 + p1->pilot->har_id));
+        snprintf(tmp, 100, lang_get2(LANG2_STR_TRADE_EQUITABLE),
+                 lang_get2_offset(LANG2_STR_ROBOT, p1->chr->pilot.har_id),
+                 lang_get2_offset(LANG2_STR_ROBOT, p1->pilot->har_id));
     } else if(trade_value > har_value) {
         char price[15];
         snprintf(price, 15, "$ %dK", trade_value - har_value);
-        snprintf(tmp, 100, lang_get(518), lang_get(31 + p1->chr->pilot.har_id), lang_get(31 + p1->pilot->har_id),
-                 price);
+        snprintf(tmp, 100, lang_get2(LANG2_STR_TRADE_GAINCASH),
+                 lang_get2_offset(LANG2_STR_ROBOT, p1->chr->pilot.har_id),
+                 lang_get2_offset(LANG2_STR_ROBOT, p1->pilot->har_id), price);
     } else if(trade_value + p1->pilot->money > har_value) {
         char price[15];
         snprintf(price, 15, "$ %dK", har_value - trade_value);
-        snprintf(tmp, 100, lang_get(519), lang_get(31 + p1->chr->pilot.har_id), price,
-                 lang_get(31 + p1->pilot->har_id));
+        snprintf(tmp, 100, lang_get2(LANG2_STR_TRADE_SPENDCASH),
+                 lang_get2_offset(LANG2_STR_ROBOT, p1->chr->pilot.har_id), price,
+                 lang_get2_offset(LANG2_STR_ROBOT, p1->pilot->har_id));
     }
 
     component *menu = lab_menu_confirm_create(s, confirm_trade, s, cancel_trade, s, tmp);
