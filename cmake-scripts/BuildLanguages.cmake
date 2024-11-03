@@ -25,7 +25,7 @@ foreach(LANG ${OMF_LANGS})
         DEPENDS "${TXT2}"
         BYPRODUCTS "${DAT2}"
         COMMAND ${CMAKE_COMMAND} -E echo_append "${LANG}, "
-        COMMAND ${OMF_COMMAND_WRAPPER} "$<TARGET_FILE:languagetool>" --import "${TXT2}" --base "${BASE_DAT}" --output "${DAT2}" --check-count ${LANG2_STRCOUNT}
+        COMMAND ${OMF_COMMAND_WRAPPER} "$<TARGET_FILE:languagetool>" --import "${TXT2}" --base "${BASE_DAT}" --base-count "${LANG_STRCOUNT}" --output "${DAT2}" --check-count ${LANG2_STRCOUNT}
     )
     install(FILES "${DAT2}" DESTINATION "${LANGUAGE_INSTALL_PATH}")
 endforeach()
@@ -41,7 +41,7 @@ foreach(LANG ${OPENOMF_LANGS})
         COMMAND ${CMAKE_COMMAND} -E echo_append "${LANG}, "
         COMMAND ${OMF_COMMAND_WRAPPER} "$<TARGET_FILE:languagetool>" --import "${TXT}" --output "${LNG}" --check-count ${LANG_STRCOUNT}
         # XXX HACK: Using DANISH.TXT as base of DANISH2 until we merge the two.
-        COMMAND ${OMF_COMMAND_WRAPPER} "$<TARGET_FILE:languagetool>" --import "${TXT2}" --base "${LNG}" --output "${LNG2}" --check-count ${LANG2_STRCOUNT}
+        COMMAND ${OMF_COMMAND_WRAPPER} "$<TARGET_FILE:languagetool>" --import "${TXT2}" --base "${LNG}"  --base-count "${LANG_STRCOUNT}" --output "${LNG2}" --check-count ${LANG2_STRCOUNT}
     )
     install(FILES "${LNG}" "${LNG2}" DESTINATION "${LANGUAGE_INSTALL_PATH}")
 endforeach()

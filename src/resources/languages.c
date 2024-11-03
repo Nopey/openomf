@@ -35,6 +35,9 @@ bool lang_init(void) {
     unsigned int const old_language_count = 990;
 
     if(language->count == old_language_count) {
+        // XXX this 990->1013 fixup is currently duplicated between languages.c and languagetool, but will be removed
+        // from languages.c soon
+
         // OMF 2.1 added netplay, and with it 23 new localization strings
         unsigned new_ids[] = {149, 150, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181,
                               182, 183, 184, 185, 267, 269, 270, 271, 284, 295, 305};

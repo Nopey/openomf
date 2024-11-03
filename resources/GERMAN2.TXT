@@ -4,8 +4,8 @@ Data: Deutsch
 
 ID: auto
 Title: Game Title
-# note that this is not the same index as in ENGLISH.DAT
-CopyBase: 284
+# note that this is using the latest 1013-long string table index now!
+CopyBase: 307
 
 ID: auto
 Title: Stadium Name

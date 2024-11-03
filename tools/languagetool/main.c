@@ -331,19 +331,57 @@ static conversion_result sd_language_from_utf8(sd_language *language) {
     return result;
 }
 
+static void fix_old_language(sd_language *language, unsigned int desired_count) {
+    // OMF 2097 v2.1 (Epic Challenge Arena) ENGLISH.DAT
+    unsigned int const new_language_count = 1013;
+    // OMF GERMAN.DAT and old versions of ENGLISH.DAT have only 990 strings
+    unsigned int const old_language_count = 990;
+
+    if(desired_count == new_language_count && language->count == old_language_count) {
+        // OMF 2.1 added netplay, and with it 23 new localization strings
+        unsigned new_ids[] = {149, 150, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181,
+                              182, 183, 184, 185, 267, 269, 270, 271, 284, 295, 305};
+        unsigned *new_ids_end = new_ids + sizeof(new_ids) / sizeof(new_ids[0]);
+
+        // insert dummy entries
+        sd_lang_string *expanded_strings = omf_malloc(new_language_count * sizeof(sd_lang_string));
+        unsigned next = 0;
+        unsigned next_from = 0;
+        for(unsigned *id = new_ids; id < new_ids_end; id++) {
+            unsigned copy_count = *id - next;
+            memcpy(expanded_strings + next, language->strings + next_from, copy_count * sizeof(sd_lang_string));
+            next += copy_count;
+            next_from += copy_count;
+
+            expanded_strings[next].data = omf_malloc(1);
+            expanded_strings[next].data[0] = '\0';
+            memcpy(expanded_strings[next].description, "dummy", 6);
+            next++;
+            language->count++;
+        }
+        memcpy(expanded_strings + next, language->strings + next_from,
+               (new_language_count - next) * sizeof(sd_lang_string));
+        omf_free(language->strings);
+        language->strings = expanded_strings;
+        assert(language->count == new_language_count);
+    }
+}
+
 int main(int argc, char *argv[]) {
     // commandline argument parser options
     struct arg_lit *help = arg_lit0("h", "help", "print this help and exit");
     struct arg_lit *vers = arg_lit0("v", "version", "print version information and exit");
     struct arg_file *file = arg_file0("f", "file", "<file>", "load OMF language file");
     struct arg_file *input = arg_file0("i", "import", "<file>", "import UTF-8 .TXT file");
-    struct arg_file *base = arg_file0("b", "base", "<file>", "load OMF language file as BASE");
+    struct arg_file *base = arg_file0(NULL, "base", "<file>", "load OMF language file as a base language");
+    struct arg_int *base_count =
+        arg_int0(NULL, "base-count", "<file>", "Check and ensure base language has this many strings");
     struct arg_int *str = arg_int0("s", "string", "<value>", "display language string number");
     struct arg_file *output = arg_file0("o", "output", "<file>", "compile output language file");
     struct arg_int *check_count =
         arg_int0("c", "check-count", "<NUM>", "Check that language file has this many entries, or bail.");
     struct arg_end *end = arg_end(20);
-    void *argtable[] = {help, vers, file, input, base, output, str, check_count, end};
+    void *argtable[] = {help, vers, file, input, base, base_count, output, str, check_count, end};
     const char *progname = "languagetool";
 
     bool language_is_utf8 = false;
@@ -406,6 +444,13 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Too many --base arguments: please supply only one.\n");
         goto exit_0;
     }
+    if(base_count->count > 0 && base->count == 0) {
+        fprintf(stderr, "Unexpected --base-count argument: it is meaningless without --base.\n");
+        goto exit_0;
+    } else if(base_count->count > 1) {
+        fprintf(stderr, "Too many --base-count arguments: please supply only one.\n");
+        goto exit_0;
+    }
 
     int ret;
 
@@ -425,6 +470,15 @@ int main(int argc, char *argv[]) {
         base_language_is_utf8 = false;
         if(ret != SD_SUCCESS) {
             fprintf(stderr, "Base language file could not be loaded! Error [%d] %s\n", ret, sd_get_error(ret));
+            goto exit_0;
+        }
+        if(base_count->count > 0) {
+            fix_old_language(&base_language, base_count->ival[0]);
+        }
+
+        if(base_count->count > 0 && (unsigned)base_count->ival[0] != base_language.count) {
+            fprintf(stderr, "Expected %u entries in base '%s', got %d!\n", (unsigned)base_count->ival[0],
+                    base->filename[0], language.count);
             goto exit_0;
         }
     }
