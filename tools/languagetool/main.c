@@ -50,6 +50,12 @@ static char *lang_nextline(char *line, size_t sizeof_line, FILE *file, int *line
             // skip comments
             continue;
         }
+        size_t len = strlen(read_line);
+        if(len >= 2 && read_line[len - 1] == '\n' && read_line[len - 2] == '\r') {
+            // Replace CRLF with LF
+            read_line[len - 2] = '\n';
+            read_line[len - 1] = '\0';
+        }
         if(should_skip == skip_empty && (*read_line == '\n' || *read_line == '\0')) {
             continue;
         }

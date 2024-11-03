@@ -1,6 +1,7 @@
 #ifndef LANGUAGES_H
 #define LANGUAGES_H
 
+#include "resources/generated_languages.h" // for LANG2_STR enum
 #include <stdbool.h>
 
 /*
@@ -34,17 +35,6 @@ enum
     // OMF versions before 2.1 shipped 990 strings.
     // (GERMAN.DAT, and old ENGLISH.DAT have this many strings)
     OLD_LANG_STR_COUNT = 990,
-};
-
-/*! \brief OpenOMF String ID
- *
- * These string IDs should match BuildLanguages.cmake, BASE.TXT, and the various ${LANG}2.TXT files
- */
-enum
-{
-    LANG2_STR_LANGUAGE,
-    // XXX TODO: Magnus: fill out LANG2_STR enum
-    LANG2_STR_COUNT = 66
 };
 
 // Gets an OMF 2097 localization string
