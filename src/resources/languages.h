@@ -31,7 +31,7 @@ enum
 
 /*! \brief OpenOMF String ID
  *
- * These string IDs should match BuildLanguages.cmake and the various ${LANG}2.TXT files
+ * These string IDs should match BuildLanguages.cmake, BASE.TXT, and the various ${LANG}2.TXT files
  */
 enum
 {

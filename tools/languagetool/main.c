@@ -372,7 +372,7 @@ int main(int argc, char *argv[]) {
     struct arg_lit *help = arg_lit0("h", "help", "print this help and exit");
     struct arg_lit *vers = arg_lit0("v", "version", "print version information and exit");
     struct arg_file *file = arg_file0("f", "file", "<file>", "load OMF language file");
-    struct arg_file *input = arg_file0("i", "import", "<file>", "import UTF-8 .TXT file");
+    struct arg_file *input = arg_filen("i", "import", "<file>", 0, 2, "import UTF-8 .TXT file");
     struct arg_file *base = arg_file0(NULL, "base", "<file>", "load OMF language file as a base language");
     struct arg_int *base_count =
         arg_int0(NULL, "base-count", "<file>", "Check and ensure base language has this many strings");
@@ -429,11 +429,14 @@ int main(int argc, char *argv[]) {
         goto exit_0;
     }
 
-    if(file->count + input->count > 1) {
-        fprintf(stderr, "Too many inputs provided! please supply one --file or --import argument.\n");
+    if(file->count > 1) {
+        fprintf(stderr, "Too many input files provided! please supply one --file.\n");
+        goto exit_0;
+    } else if(file->count > 1 && input->count > 1) {
+        fprintf(stderr, "--import and --file arguments are incompatible.\n");
         goto exit_0;
     } else if(file->count + input->count < 1) {
-        fprintf(stderr, "Not enough inputs provided! please supply one --file or --import argument.\n");
+        fprintf(stderr, "No input provided! please supply a --file or at least one --import argument.\n");
         goto exit_0;
     }
 
@@ -483,18 +486,18 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // Import TXT file
-    if(input->count > 0) {
+    // Import TXT files
+    for(int i = 0; i < input->count; i++) {
         char const *expected_ext = ".TXT";
-        if(!input->extension[0] || strcmp(input->extension[0], expected_ext) != 0) {
-            fprintf(stderr, "Refusing to open input file %s, does not have expected %s file extension.\n",
-                    input->filename[0], expected_ext);
+        if(!input->extension[i] || strcmp(input->extension[i], expected_ext) != 0) {
+            fprintf(stderr, "Refusing to import file %s, does not have expected %s file extension.\n",
+                    input->filename[i], expected_ext);
             goto exit_0;
         }
         // parse the supplied text file
-        FILE *file = fopen(input->filename[0], "rb");
+        FILE *file = fopen(input->filename[i], "rb");
         if(!file) {
-            fprintf(stderr, "Could not open %s\n", input->filename[0]);
+            fprintf(stderr, "Could not open %s for import\n", input->filename[i]);
             goto exit_0;
         }
 
@@ -502,7 +505,7 @@ int main(int argc, char *argv[]) {
             conversion_result result = sd_language_to_utf8(&base_language);
             if(result.error_code != CP437_SUCCESS) {
                 fprintf(stderr, "Error converting base language '%s' to UTF-8! Error %s on language entry %u\n",
-                        base->filename[0], cp437_result_to_string(result.error_code), result.string_index);
+                        base->filename[i], cp437_result_to_string(result.error_code), result.string_index);
                 goto exit_0;
             }
             base_language_is_utf8 = true;
@@ -510,8 +513,10 @@ int main(int argc, char *argv[]) {
 
         // line is incremented prior to parsing each line
         int line = 0;
-        language_is_utf8 = true;
-        assert(base_language_is_utf8 == language_is_utf8);
+        if(language.count == 0) {
+            language_is_utf8 = true;
+        }
+        assert(base_language_is_utf8 && language_is_utf8);
         while(read_entry(file, &language, &base_language, &line)) {
         }
     }

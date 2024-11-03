@@ -1,24 +1,3 @@
 ID: 0
 Title: Translation Name
 Data: Deutsch
-
-ID: auto
-Title: Game Title
-# note that this is using the latest 1013-long string table index now!
-CopyBase: 307
-
-ID: auto
-Title: Stadium Name
-CopyBase: 56..=61
-
-ID: auto
-Title: newsreport unranked challenger
-CopyBase: 76..=79
-
-ID: auto
-Title: newsreport pronoun
-CopyBase: 81..=86
-
-ID: auto
-Title: newsreport text
-CopyBase: 87..=134
