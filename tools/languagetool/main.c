@@ -13,6 +13,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdnoreturn.h>
 #include <string.h>
 #if ARGTABLE2_FOUND
 #include <argtable2.h>
@@ -24,7 +25,7 @@
 #define MAX_DATA 8192 // Data field cannot exceed 32 bytes
 #define MAX_TITLE 32
 
-void error_exit(const char *message, int line_number) {
+noreturn void error_exit(const char *message, int line_number) {
     fprintf(stderr, "Error on line %d: %s\n", line_number, message);
     exit(EXIT_FAILURE);
 }
