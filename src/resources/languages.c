@@ -9,12 +9,48 @@
 #include <assert.h>
 #include <string.h>
 
-static sd_language *language;
-static sd_language *language2;
+static char **language_compact;
+static char **language2_compact;
+
+static char **lang_compact(sd_language *lang) {
+    // calculate in-memory size of language's data
+    unsigned int data_byte_count = 0;
+    for(unsigned int i = 0; i < lang->count; i++) {
+        char const *data = lang->strings[i].data;
+        data_byte_count += (data ? strlen(data) : 0) + 1;
+    }
+
+    char **allocation = omf_malloc(lang->count * sizeof(char *) + data_byte_count);
+    char *strings = (char *)(allocation + lang->count);
+
+    // fill the allocation
+    char **ptr_iter = allocation;
+    char *strings_iter = strings;
+    for(unsigned int i = 0; i < lang->count; i++) {
+        *(ptr_iter++) = strings_iter;
+
+        char const *data = lang->strings[i].data;
+        if(data) {
+            size_t data_size = strlen(data) + 1;
+            memcpy(strings_iter, data, data_size);
+            strings_iter += data_size;
+        } else {
+            strings_iter[0] = '\0';
+            strings_iter += 1;
+        }
+    }
+
+    assert(ptr_iter == allocation + lang->count);
+    assert(strings_iter == strings + data_byte_count);
+
+    return allocation;
+}
 
 bool lang_init(void) {
-    language = NULL;
-    language2 = NULL;
+    language_compact = NULL;
+    language2_compact = NULL;
+    sd_language *language = NULL;
+    sd_language *language2 = NULL;
 
     str filename_str;
     const char *dirname = pm_get_local_path(RESOURCE_PATH);
@@ -23,7 +59,8 @@ bool lang_init(void) {
     char const *filename = str_c(&filename_str);
 
     // Load up language file
-    language = omf_calloc(1, sizeof(sd_language));
+    sd_language language_real;
+    language = &language_real;
     if(sd_language_create(language) != SD_SUCCESS) {
         goto error_0;
     }
@@ -75,7 +112,8 @@ bool lang_init(void) {
     str_append_c(&filename_str, "2");
     filename = str_c(&filename_str);
 
-    language2 = omf_calloc(1, sizeof(sd_language));
+    sd_language language2_data;
+    language2 = &language2_data;
     if(sd_language_create(language2) != SD_SUCCESS) {
         goto error_0;
     }
@@ -92,31 +130,35 @@ bool lang_init(void) {
 
     str_free(&filename_str);
 
-    // XXX we're wasting 32KB of memory on language->strings[...].description
+    language_compact = lang_compact(language);
+    language2_compact = lang_compact(language2);
+
+    sd_language_free(language);
+    sd_language_free(language2);
 
     return true;
 
 error_0:
     str_free(&filename_str);
+    sd_language_free(language);
+    sd_language_free(language2);
     lang_close();
     return false;
 }
 
 void lang_close(void) {
-    sd_language_free(language);
-    omf_free(language);
-    sd_language_free(language2);
-    omf_free(language2);
+    omf_free(language_compact);
+    omf_free(language2_compact);
 }
 
 const char *lang_get(unsigned int id) {
-    assert(id < language->count && language->strings[id].data != NULL);
-    return language->strings[id].data;
+    assert(id < LANG_STR_COUNT);
+    return language_compact[id];
 }
 
 const char *lang_get2(unsigned int id) {
-    assert(id < language2->count && language2->strings[id].data != NULL);
-    return language2->strings[id].data;
+    assert(id < LANG2_STR_COUNT);
+    return language2_compact[id];
 }
 
 const char *lang_get2_offset_impl(unsigned int id, unsigned int count, unsigned int offset) {
