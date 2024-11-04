@@ -67,7 +67,7 @@ foreach(LANG ${OMF_LANGS})
     set(BASE_DAT "${${LANG}_DAT}")
     list(APPEND BUILD_LANG_SOURCES "${TXT2}")
     list(APPEND BUILD_LANG_COMMANDS
-        DEPENDS "${TXT2}" "${BASE_TXT}"
+        DEPENDS "${TXT2}" "${BASE_TXT}" "${BASE_DAT}"
         BYPRODUCTS "${LNG}"
         COMMAND ${CMAKE_COMMAND} -E echo_append "${LANG}, "
         COMMAND ${OMF_COMMAND_WRAPPER} "$<TARGET_FILE:languagetool>" --import "${BASE_TXT}" --import "${TXT2}" --base "${BASE_DAT}" --base-count "${OMF_STR_COUNT}" --output "${LNG}" --check-count ${Lang_Count}
@@ -76,17 +76,13 @@ foreach(LANG ${OMF_LANGS})
 endforeach()
 foreach(LANG ${OPENOMF_LANGS})
     set(TXT "${PROJECT_SOURCE_DIR}/resources/${LANG}.TXT")
-    set(TXT2 "${PROJECT_SOURCE_DIR}/resources/${LANG}2.TXT")
-    set(DAT "${CMAKE_CURRENT_BINARY_DIR}/resources/${LANG}.DAT")
     set(LNG "${CMAKE_CURRENT_BINARY_DIR}/resources/${LANG}.LNG")
-    list(APPEND BUILD_LANG_SOURCES "${TXT}" "${TXT2}")
+    list(APPEND BUILD_LANG_SOURCES "${TXT}")
     list(APPEND BUILD_LANG_COMMANDS
-        DEPENDS "${TXT}" "${TXT2}"
-        BYPRODUCTS "${DAT}" "{LNG}"
+        DEPENDS "${TXT}"
+        BYPRODUCTS "{LNG}"
         COMMAND ${CMAKE_COMMAND} -E echo_append "${LANG}, "
-        COMMAND ${OMF_COMMAND_WRAPPER} "$<TARGET_FILE:languagetool>" --import "${TXT}" --output "${DAT}" --check-count ${OMF_STR_COUNT}
-        # XXX HACK: Using DANISH.TXT as base of DANISH2 until we merge the two.
-        COMMAND ${OMF_COMMAND_WRAPPER} "$<TARGET_FILE:languagetool>" --import "${BASE_TXT}" --import "${TXT2}" --base "${DAT}"  --base-count "${OMF_STR_COUNT}" --output "${LNG}" --check-count ${Lang_Count}
+        COMMAND ${OMF_COMMAND_WRAPPER} "$<TARGET_FILE:languagetool>" --import "${TXT}" --output "${LNG}" --check-count ${Lang_Count}
     )
     install(FILES "${LNG}" DESTINATION "${LANGUAGE_INSTALL_PATH}")
 endforeach()
