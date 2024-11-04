@@ -1,7 +1,7 @@
 #ifndef LANGUAGES_H
 #define LANGUAGES_H
 
-#include "resources/generated_languages.h" // for LANG2_STR enum
+#include "resources/generated_languages.h" // for Lang enum
 #include <stdbool.h>
 
 /*
@@ -26,13 +26,9 @@ enum
 
 // Gets an openomf localization string
 const char *lang_get(unsigned int id);
-// Gets an openomf localization string
-#define lang_get2(id) lang_get(id)
 
 // Gets an openomf localization string (from one of the tables)
-#define lang_get_offset(LANG2_STR, offset) lang_get_offset_impl(LANG2_STR, LANG2_STR##_COUNT, (offset))
-// Gets an openomf localization string (from one of the tables)
-#define lang_get2_offset(LANG2_STR, offset) lang_get_offset_impl(LANG2_STR, LANG2_STR##_COUNT, (offset))
-const char *lang_get_offset_impl(unsigned int id, unsigned int count, unsigned int offset);
+#define lang_get_offset(id, offset) lang_get_offset_impl(id, id##_LAST, (offset))
+const char *lang_get_offset_impl(unsigned int id, unsigned int id_last, unsigned int offset);
 
 #endif // LANGUAGES_H

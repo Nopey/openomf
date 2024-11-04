@@ -145,7 +145,7 @@ void lab_menu_focus_arena(component *c, bool focused, void *userdata) {
         if(enemy) {
             char tmp[100];
             // XXX lang string provided format string
-            snprintf(tmp, 100, lang_get2(LANG2_STR_TOURNAMENT_FIGHT), enemy->pilot.name);
+            snprintf(tmp, 100, lang_get(LangTournamentFight), enemy->pilot.name);
             mechlab_set_hint(s, tmp);
         }
     }
@@ -154,63 +154,63 @@ void lab_menu_focus_arena(component *c, bool focused, void *userdata) {
 void lab_menu_focus_training(component *c, bool focused, void *userdata) {
     if(focused) {
         scene *s = userdata;
-        mechlab_set_hint(s, lang_get2(LANG2_STR_ENTER_TRAINING_HELP));
+        mechlab_set_hint(s, lang_get(LangEnterTrainingHelp));
     }
 }
 
 void lab_menu_focus_buy(component *c, bool focused, void *userdata) {
     if(focused) {
         scene *s = userdata;
-        mechlab_set_hint(s, lang_get2(LANG2_STR_BUY_UPGRADES_HELP));
+        mechlab_set_hint(s, lang_get(LangBuyUpgradesHelp));
     }
 }
 
 void lab_menu_focus_sell(component *c, bool focused, void *userdata) {
     if(focused) {
         scene *s = userdata;
-        mechlab_set_hint(s, lang_get2(LANG2_STR_SELL_UPGRADES_HELP));
+        mechlab_set_hint(s, lang_get(LangSellUpgradesHelp));
     }
 }
 
 void lab_menu_focus_load(component *c, bool focused, void *userdata) {
     if(focused) {
         scene *s = userdata;
-        mechlab_set_hint(s, lang_get2(LANG2_STR_CHR_LOAD_HELP));
+        mechlab_set_hint(s, lang_get(LangChrLoadHelp));
     }
 }
 
 void lab_menu_focus_new(component *c, bool focused, void *userdata) {
     if(focused) {
         scene *s = userdata;
-        mechlab_set_hint(s, lang_get2(LANG2_STR_CHR_CREATE_HELP));
+        mechlab_set_hint(s, lang_get(LangChrCreateHelp));
     }
 }
 
 void lab_menu_focus_delete(component *c, bool focused, void *userdata) {
     if(focused) {
         scene *s = userdata;
-        mechlab_set_hint(s, lang_get2(LANG2_STR_CHR_DELETE_HELP));
+        mechlab_set_hint(s, lang_get(LangChrDeleteHelp));
     }
 }
 
 void lab_menu_focus_sim(component *c, bool focused, void *userdata) {
     if(focused) {
         scene *s = userdata;
-        mechlab_set_hint(s, lang_get2(LANG2_STR_TOURNAMENT_SIM_HELP));
+        mechlab_set_hint(s, lang_get(LangTournamentSimHelp));
     }
 }
 
 void lab_menu_focus_quit(component *c, bool focused, void *userdata) {
     if(focused) {
         scene *s = userdata;
-        mechlab_set_hint(s, lang_get2(LANG2_STR_TOURNAMENT_QUIT_HELP));
+        mechlab_set_hint(s, lang_get(LangTournamentQuitHelp));
     }
 }
 
 void lab_menu_focus_tournament(component *c, bool focused, void *userdata) {
     if(focused) {
         scene *s = userdata;
-        mechlab_set_hint(s, lang_get2(LANG2_STR_TOURNAMENT_REGISTER_HELP));
+        mechlab_set_hint(s, lang_get(LangTournamentRegisterHelp));
     }
 }
 

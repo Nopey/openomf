@@ -122,7 +122,7 @@ static void lab_menu_focus_power(component *c, bool focused, void *userdata) {
         scene *s = userdata;
         game_player *p1 = game_state_get_player(s->gs, 0);
         sd_pilot *pilot = game_player_get_pilot(p1);
-        label_set_text(label1, lang_get2_offset(LANG2_STR_TRAINING_TITLE, FOCUS_POWER));
+        label_set_text(label1, lang_get_offset(LangTrainingTitle, FOCUS_POWER));
         if(pilot->power > 23) {
             label_set_text(label2, "UNAVAILABLE");
         } else {
@@ -132,7 +132,7 @@ static void lab_menu_focus_power(component *c, bool focused, void *userdata) {
             snprintf(tmp, sizeof(tmp), "$ %sK", price_str);
             label_set_text(label2, tmp);
         }
-        mechlab_set_hint(s, lang_get2_offset(LANG2_STR_TRAINING_HELP, FOCUS_POWER));
+        mechlab_set_hint(s, lang_get_offset(LangTrainingHelp, FOCUS_POWER));
     }
 }
 
@@ -141,7 +141,7 @@ static void lab_menu_focus_agility(component *c, bool focused, void *userdata) {
         scene *s = userdata;
         game_player *p1 = game_state_get_player(s->gs, 0);
         sd_pilot *pilot = game_player_get_pilot(p1);
-        label_set_text(label1, lang_get2_offset(LANG2_STR_TRAINING_TITLE, FOCUS_AGILITY));
+        label_set_text(label1, lang_get_offset(LangTrainingTitle, FOCUS_AGILITY));
         if(pilot->agility > 23) {
             label_set_text(label2, "UNAVAILABLE");
         } else {
@@ -151,7 +151,7 @@ static void lab_menu_focus_agility(component *c, bool focused, void *userdata) {
             snprintf(tmp, sizeof(tmp), "$ %sK", price_str);
             label_set_text(label2, tmp);
         }
-        mechlab_set_hint(s, lang_get2_offset(LANG2_STR_TRAINING_HELP, FOCUS_AGILITY));
+        mechlab_set_hint(s, lang_get_offset(LangTrainingHelp, FOCUS_AGILITY));
     }
 }
 
@@ -160,7 +160,7 @@ static void lab_menu_focus_endurance(component *c, bool focused, void *userdata)
         scene *s = userdata;
         game_player *p1 = game_state_get_player(s->gs, 0);
         sd_pilot *pilot = game_player_get_pilot(p1);
-        label_set_text(label1, lang_get2_offset(LANG2_STR_TRAINING_TITLE, FOCUS_ENDURANCE));
+        label_set_text(label1, lang_get_offset(LangTrainingTitle, FOCUS_ENDURANCE));
         if(pilot->endurance > 23) {
             label_set_text(label2, "UNAVAILABLE");
         } else {
@@ -170,7 +170,7 @@ static void lab_menu_focus_endurance(component *c, bool focused, void *userdata)
             snprintf(tmp, sizeof(tmp), "$ %sK", price_str);
             label_set_text(label2, tmp);
         }
-        mechlab_set_hint(s, lang_get2_offset(LANG2_STR_TRAINING_HELP, FOCUS_ENDURANCE));
+        mechlab_set_hint(s, lang_get_offset(LangTrainingHelp, FOCUS_ENDURANCE));
     }
 }
 
@@ -179,7 +179,7 @@ void lab_menu_focus_training_done(component *c, bool focused, void *userdata) {
         scene *s = userdata;
         label_set_text(label1, "");
         label_set_text(label2, "");
-        mechlab_set_hint(s, lang_get2(LANG2_STR_TRAINING_DONE));
+        mechlab_set_hint(s, lang_get(LangTrainingDone));
     }
 }
 

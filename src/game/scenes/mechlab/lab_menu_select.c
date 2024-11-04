@@ -72,7 +72,7 @@ component *lab_menu_select_create(scene *s, lab_menu_select_cb select, void *sel
     tconf.direction = TEXT_HORIZONTAL;
 
     sprite *bsprite = animation_get_sprite(main_buttons, 0);
-    component *button = spritebutton_create(&tconf, lang_get2(LANG2_STR_BUTTON_SELECT), bsprite->data, COM_ENABLED,
+    component *button = spritebutton_create(&tconf, lang_get(LangButtonSelect), bsprite->data, COM_ENABLED,
                                             lab_menu_select_choose, selector);
 
     component_set_size_hints(button, bsprite->data->w, bsprite->data->h);

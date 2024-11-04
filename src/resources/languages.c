@@ -65,7 +65,7 @@ bool lang_init(void) {
         goto error_0;
     }
 
-    if(language->count != LANG2_STR_COUNT) {
+    if(language->count != Lang_Count) {
         PERROR("Unable to load language file '%s', unsupported or corrupt file!", filename);
         goto error_0;
     }
@@ -91,11 +91,11 @@ void lang_close(void) {
 }
 
 const char *lang_get(unsigned int id) {
-    assert(id < LANG2_STR_COUNT);
+    assert(id < Lang_Count);
     return language_compact[id];
 }
 
-const char *lang_get_offset_impl(unsigned int id, unsigned int count, unsigned int offset) {
-    assert(offset <= count);
+const char *lang_get_offset_impl(unsigned int id, unsigned int id_last, unsigned int offset) {
+    assert((id + offset) <= id_last);
     return lang_get(id + offset);
 }

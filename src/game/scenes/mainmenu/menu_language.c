@@ -97,13 +97,13 @@ component *menu_language_create(scene *s) {
             sd_language_free(&lang);
             continue;
         }
-        if(lang.count != LANG2_STR_COUNT) {
+        if(lang.count != Lang_Count) {
             INFO("Warning: Invalid language file '%s', got %d entries!", str_c(&filename2), lang.count);
             sd_language_free(&lang);
             continue;
         }
-        char *language_name = lang.strings[LANG2_STR_LANGUAGE].data;
-        lang.strings[LANG2_STR_LANGUAGE].data = NULL;
+        char *language_name = lang.strings[LangLanguage].data;
+        lang.strings[LangLanguage].data = NULL;
         sd_language_free(&lang);
 
         if(strcmp(setting->language.language, filename) == 0) {

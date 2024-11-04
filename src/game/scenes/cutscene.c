@@ -134,7 +134,7 @@ int cutscene_create(scene *scene) {
     switch(scene->id) {
         case SCENE_END:
             audio_play_music(PSM_END);
-            text = lang_get2(LANG2_STR_END);
+            text = lang_get(LangSceneEnd);
             local->text_x = 10;
             local->text_y = 5;
             local->text_width = 300;
@@ -142,7 +142,7 @@ int cutscene_create(scene *scene) {
             break;
 
         case SCENE_END1:
-            text = lang_get2_offset(LANG2_STR_END1, p1->pilot->pilot_id);
+            text = lang_get_offset(LangSceneEnd1, p1->pilot->pilot_id);
             local->text_x = 10;
             local->text_y = 157;
             local->text_width = 300;
@@ -166,7 +166,7 @@ int cutscene_create(scene *scene) {
             break;
 
         case SCENE_END2:
-            text = lang_get2_offset(LANG2_STR_END2, p1->pilot->pilot_id);
+            text = lang_get_offset(LangSceneEnd2, p1->pilot->pilot_id);
             local->text_x = 10;
             local->text_y = 160;
             local->text_width = 300;
