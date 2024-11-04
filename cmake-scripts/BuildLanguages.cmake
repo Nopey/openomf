@@ -82,7 +82,7 @@ foreach(LANG ${OMF_LANGS})
         DEPENDS "${TXT2}" "${BASE_TXT}" "${BASE_DAT}"
         BYPRODUCTS "${LNG}"
         COMMAND ${CMAKE_COMMAND} -E echo_append "${LANG}, "
-        COMMAND ${OMF_COMMAND_WRAPPER} "$<TARGET_FILE:languagetool>" --import "${BASE_TXT}" --import "${TXT2}" --base "${BASE_DAT}" --base-count "${OMF_STR_COUNT}" --output "${LNG}" --check-count ${Lang_Count}
+        COMMAND ${OMF_COMMAND_WRAPPER} "$<TARGET_FILE:languagetool>" --import "${BASE_TXT}" --import "${TXT2}" --base "${BASE_DAT}" --base-count "${OMF_STR_COUNT}" --strip --output "${LNG}" --check-count ${Lang_Count}
     )
     install(FILES "${LNG}" DESTINATION "${LANGUAGE_INSTALL_PATH}")
 endforeach()
@@ -94,7 +94,7 @@ foreach(LANG ${OPENOMF_LANGS})
         DEPENDS "${TXT}"
         BYPRODUCTS "{LNG}"
         COMMAND ${CMAKE_COMMAND} -E echo_append "${LANG}, "
-        COMMAND ${OMF_COMMAND_WRAPPER} "$<TARGET_FILE:languagetool>" --import "${TXT}" --output "${LNG}" --check-count ${Lang_Count}
+        COMMAND ${OMF_COMMAND_WRAPPER} "$<TARGET_FILE:languagetool>" --import "${TXT}" --strip --output "${LNG}" --check-count ${Lang_Count}
     )
     install(FILES "${LNG}" DESTINATION "${LANGUAGE_INSTALL_PATH}")
 endforeach()

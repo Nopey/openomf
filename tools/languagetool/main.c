@@ -380,11 +380,12 @@ int main(int argc, char *argv[]) {
     struct arg_int *base_count =
         arg_int0(NULL, "base-count", "<file>", "Check and ensure base language has this many strings");
     struct arg_int *str = arg_int0("s", "string", "<value>", "display language string number");
+    struct arg_lit *strip = arg_lit0(NULL, "strip", "strip leading and trailing whitespace");
     struct arg_file *output = arg_file0("o", "output", "<file>", "compile output language file");
     struct arg_int *check_count =
         arg_int0("c", "check-count", "<NUM>", "Check that language file has this many entries, or bail.");
     struct arg_end *end = arg_end(20);
-    void *argtable[] = {help, vers, file, input, base, base_count, output, str, check_count, end};
+    void *argtable[] = {help, vers, file, input, base, base_count, strip, output, str, check_count, end};
     const char *progname = "languagetool";
 
     bool language_is_utf8 = false;
@@ -432,10 +433,7 @@ int main(int argc, char *argv[]) {
         goto exit_0;
     }
 
-    if(file->count > 1) {
-        fprintf(stderr, "Too many input files provided! please supply one --file.\n");
-        goto exit_0;
-    } else if(file->count > 1 && input->count > 1) {
+    if(file->count > 1 && input->count > 1) {
         fprintf(stderr, "--import and --file arguments are incompatible.\n");
         goto exit_0;
     } else if(file->count + input->count < 1) {
@@ -446,15 +444,9 @@ int main(int argc, char *argv[]) {
     if(base->count > 0 && input->count == 0) {
         fprintf(stderr, "Unexpected --base argument: it is meaningless without --import.\n");
         goto exit_0;
-    } else if(base->count > 1) {
-        fprintf(stderr, "Too many --base arguments: please supply only one.\n");
-        goto exit_0;
     }
     if(base_count->count > 0 && base->count == 0) {
         fprintf(stderr, "Unexpected --base-count argument: it is meaningless without --base.\n");
-        goto exit_0;
-    } else if(base_count->count > 1) {
-        fprintf(stderr, "Too many --base-count arguments: please supply only one.\n");
         goto exit_0;
     }
 
@@ -527,6 +519,16 @@ int main(int argc, char *argv[]) {
     if(check_count->count > 0 && (unsigned)check_count->ival[0] != language.count) {
         fprintf(stderr, "Expected %u entries, got %d!\n", (unsigned)check_count->ival[0], language.count);
         goto exit_0;
+    }
+
+    if(strip->count) {
+        struct str s;
+        for(unsigned int id = 0; id < language.count; id++) {
+            str_from_c(&s, language.strings[id].data);
+            str_strip(&s);
+            memcpy(language.strings[id].data, str_c(&s), str_size(&s) + 1);
+            str_free(&s);
+        }
     }
 
     // Print
