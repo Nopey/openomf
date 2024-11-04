@@ -44,6 +44,13 @@ file(WRITE "${BASE_TXT}" "${BASETXT_CONTENTS}")
 message(STATUS "BuildLanguages LANG2_STR_COUNT: ${LANG2_STR_COUNT}")
 
 
+
+if(NOT BUILD_LANGUAGES)
+    # early out, having written generated_languages.h
+    return()
+endif()
+
+
 if(WIN32)
     set(LANGUAGE_INSTALL_PATH "openomf/resources/")
 else()
@@ -58,7 +65,7 @@ foreach(LANG ${OMF_LANGS})
     set(LNG "${CMAKE_CURRENT_BINARY_DIR}/resources/${LANG}.LNG")
     find_file("${LANG}_DAT" "${LANG}.DAT" PATHS "${CMAKE_CURRENT_BINARY_DIR}/resources" "${PROJECT_SOURCE_DIR}/resources" REQUIRED)
     set(BASE_DAT "${${LANG}_DAT}")
-    list(APPEND BUILD_LANG_SORUCES "${TXT2}")
+    list(APPEND BUILD_LANG_SOURCES "${TXT2}")
     list(APPEND BUILD_LANG_COMMANDS
         DEPENDS "${TXT2}"
         BYPRODUCTS "${LNG}"
@@ -72,7 +79,7 @@ foreach(LANG ${OPENOMF_LANGS})
     set(TXT2 "${PROJECT_SOURCE_DIR}/resources/${LANG}2.TXT")
     set(DAT "${CMAKE_CURRENT_BINARY_DIR}/resources/${LANG}.DAT")
     set(LNG "${CMAKE_CURRENT_BINARY_DIR}/resources/${LANG}.LNG")
-    list(APPEND BUILD_LANG_SORUCES "${TXT}" "${TXT2}")
+    list(APPEND BUILD_LANG_SOURCES "${TXT}" "${TXT2}")
     list(APPEND BUILD_LANG_COMMANDS
         DEPENDS "${TXT}" "${TXT2}"
         BYPRODUCTS "${DAT}" "{LNG}"
@@ -91,6 +98,6 @@ add_custom_target(build_languages
     ${BUILD_LANG_COMMANDS}
     COMMAND ${CMAKE_COMMAND} -E echo "done"
 )
-target_sources(build_languages PRIVATE ${BUILD_LANG_SORUCES})
+target_sources(build_languages PRIVATE ${BUILD_LANG_SOURCES})
 add_dependencies(openomf build_languages)
 add_dependencies(build_languages languagetool)
