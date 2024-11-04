@@ -55,32 +55,33 @@ set(BUILD_LANG_COMMANDS)
 set(BUILD_LANG_SOURCES)
 foreach(LANG ${OMF_LANGS})
     set(TXT2 "${PROJECT_SOURCE_DIR}/resources/${LANG}2.TXT")
-    set(DAT2 "${CMAKE_CURRENT_BINARY_DIR}/resources/${LANG}.DAT2")
-    set(BASE_DAT "${CMAKE_CURRENT_BINARY_DIR}/resources/${LANG}.DAT")
+    set(LNG "${CMAKE_CURRENT_BINARY_DIR}/resources/${LANG}.LNG")
+    find_file("${LANG}_DAT" "${LANG}.DAT" PATHS "${CMAKE_CURRENT_BINARY_DIR}/resources" "${PROJECT_SOURCE_DIR}/resources" REQUIRED)
+    set(BASE_DAT "${${LANG}_DAT}")
     list(APPEND BUILD_LANG_SORUCES "${TXT2}")
     list(APPEND BUILD_LANG_COMMANDS
         DEPENDS "${TXT2}"
-        BYPRODUCTS "${DAT2}"
+        BYPRODUCTS "${LNG}"
         COMMAND ${CMAKE_COMMAND} -E echo_append "${LANG}, "
-        COMMAND ${OMF_COMMAND_WRAPPER} "$<TARGET_FILE:languagetool>" --import "${TXT2}" --import "${BASE_TXT}" --base "${BASE_DAT}" --base-count "${LANG_STR_COUNT}" --output "${DAT2}" --check-count ${LANG2_STR_COUNT}
+        COMMAND ${OMF_COMMAND_WRAPPER} "$<TARGET_FILE:languagetool>" --import "${TXT2}" --import "${BASE_TXT}" --base "${BASE_DAT}" --base-count "${LANG_STR_COUNT}" --output "${LNG}" --check-count ${LANG2_STR_COUNT}
     )
-    install(FILES "${DAT2}" DESTINATION "${LANGUAGE_INSTALL_PATH}")
+    install(FILES "${LNG}" DESTINATION "${LANGUAGE_INSTALL_PATH}")
 endforeach()
 foreach(LANG ${OPENOMF_LANGS})
     set(TXT "${PROJECT_SOURCE_DIR}/resources/${LANG}.TXT")
     set(TXT2 "${PROJECT_SOURCE_DIR}/resources/${LANG}2.TXT")
+    set(DAT "${CMAKE_CURRENT_BINARY_DIR}/resources/${LANG}.DAT")
     set(LNG "${CMAKE_CURRENT_BINARY_DIR}/resources/${LANG}.LNG")
-    set(LNG2 "${CMAKE_CURRENT_BINARY_DIR}/resources/${LANG}.LNG2")
     list(APPEND BUILD_LANG_SORUCES "${TXT}" "${TXT2}")
     list(APPEND BUILD_LANG_COMMANDS
         DEPENDS "${TXT}" "${TXT2}"
-        BYPRODUCTS "${LNG}" "{LNG2}"
+        BYPRODUCTS "${DAT}" "{LNG}"
         COMMAND ${CMAKE_COMMAND} -E echo_append "${LANG}, "
-        COMMAND ${OMF_COMMAND_WRAPPER} "$<TARGET_FILE:languagetool>" --import "${TXT}" --output "${LNG}" --check-count ${LANG_STR_COUNT}
+        COMMAND ${OMF_COMMAND_WRAPPER} "$<TARGET_FILE:languagetool>" --import "${TXT}" --output "${DAT}" --check-count ${LANG_STR_COUNT}
         # XXX HACK: Using DANISH.TXT as base of DANISH2 until we merge the two.
-        COMMAND ${OMF_COMMAND_WRAPPER} "$<TARGET_FILE:languagetool>" --import "${TXT2}" --import "${BASE_TXT}" --base "${LNG}"  --base-count "${LANG_STR_COUNT}" --output "${LNG2}" --check-count ${LANG2_STR_COUNT}
+        COMMAND ${OMF_COMMAND_WRAPPER} "$<TARGET_FILE:languagetool>" --import "${TXT2}" --import "${BASE_TXT}" --base "${DAT}"  --base-count "${LANG_STR_COUNT}" --output "${LNG}" --check-count ${LANG2_STR_COUNT}
     )
-    install(FILES "${LNG}" "${LNG2}" DESTINATION "${LANGUAGE_INSTALL_PATH}")
+    install(FILES "${LNG}" DESTINATION "${LANGUAGE_INSTALL_PATH}")
 endforeach()
 
 
