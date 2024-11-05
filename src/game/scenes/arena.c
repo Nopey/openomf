@@ -595,7 +595,9 @@ void arena_har_defeat_hook(int player_id, scene *scene) {
     score->rounds++;
     if(score->rounds >= ceilf(local->rounds / 2.0f)) {
         har_set_ani(winner, ANIM_VICTORY, 0);
-        chr_score_victory(score, har_health_percent(winner_har));
+        if(!is_twoplayer(scene)) {
+            chr_score_victory(score, har_health_percent(winner_har));
+        }
         winner_har->state = STATE_VICTORY;
         local->over = 1;
         if(is_singleplayer(scene)) {
