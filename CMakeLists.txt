@@ -37,7 +37,7 @@ if(MSVC)
     # remove cmake's default /W3 to avoid warning D9025
     string(REGEX REPLACE "/W3" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
     # we would probably like to pass /Wall instead of /W4, but there's a lot
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /permissive- /W4")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /permissive- /W4 /wd4100")
 else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wformat -pedantic -Wvla")
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb -DDEBUGMODE -Werror -fno-omit-frame-pointer")
