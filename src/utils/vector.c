@@ -29,6 +29,11 @@ void vector_clear(vector *vec) {
     vec->blocks = 0;
 }
 
+void vector_zero(vector *vec) {
+    if(vec->data)
+        memset(vec->data, 0, vec->block_size * vec->blocks);
+}
+
 void vector_free(vector *vec) {
     vec->blocks = 0;
     vec->reserved = 0;
