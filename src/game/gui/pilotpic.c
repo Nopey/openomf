@@ -19,7 +19,7 @@ typedef struct {
 static void pilotpic_render(component *c) {
     pilotpic *g = widget_get_obj(c);
     if(g->img != NULL) {
-        video_draw(g->img->data, c->x, c->y);
+        video_draw(sprite_get_surface(g->img), c->x, c->y);
     }
 }
 
@@ -79,7 +79,8 @@ void pilotpic_select(component *c, int pic_id, int pilot_id) {
 
     // Position and size hints for the gui component
     // These are set on layout function call
-    component_set_size_hints(c, local->img->data->w, local->img->data->h);
+    surface *img_surf = sprite_get_surface(local->img);
+    component_set_size_hints(c, img_surf->w, img_surf->h);
 
     // Save some information
     local->selected = pilot_id;
@@ -119,9 +120,10 @@ void pilotpic_set_photo(component *c, sd_sprite *spr) {
     }
 
     local->img = omf_calloc(1, sizeof(sprite));
-
     sprite_create(local->img, spr, -1);
-    component_set_size_hints(c, local->img->data->w, local->img->data->h);
+    surface *img_surf = sprite_get_surface(local->img);
+
+    component_set_size_hints(c, img_surf->w, img_surf->h);
 }
 
 component *pilotpic_create(int pic_id, int pilot_id) {

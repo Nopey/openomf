@@ -152,11 +152,11 @@ void player_describe_object(object *obj) {
     DEBUG("  - Velocity: %d, %d", obj->vel.x, obj->vel.y);
     if(obj->cur_sprite_id) {
         sprite *cur_sprite = animation_get_sprite(obj->cur_animation, obj->cur_sprite_id);
+        surface *cur_surf = sprite_get_surface(cur_sprite);
         DEBUG("  - Pos: %d, %d", cur_sprite->pos.x, cur_sprite->pos.y);
-        DEBUG("  - Size: %d, %d", cur_sprite->data->w, cur_sprite->data->h);
+        DEBUG("  - Size: %d, %d", cur_surf->w, cur_surf->h);
         player_sprite_state *rstate = &obj->sprite_state;
-        DEBUG("CURRENT = %d - %d + %d - %d", obj->pos.y, cur_sprite->pos.y, rstate->o_correction.y,
-              cur_sprite->data->h);
+        DEBUG("CURRENT = %d - %d + %d - %d", obj->pos.y, cur_sprite->pos.y, rstate->o_correction.y, cur_surf->h);
     }
 }
 

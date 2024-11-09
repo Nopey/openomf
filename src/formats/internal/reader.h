@@ -10,6 +10,9 @@ typedef struct sd_reader sd_reader;
 
 sd_reader *sd_reader_open(const char *file);
 
+// allows sd_reader_close to be called one more time on reader before actually closing the file
+void sd_reader_addref(sd_reader *reader);
+
 /**
  * Check for errors
  */

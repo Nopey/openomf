@@ -12,12 +12,14 @@ struct sd_reader {
     FILE *handle;
     long filesize;
     int sd_errno;
+    unsigned int refcount;
 };
 
 sd_reader *sd_reader_open(const char *file) {
     sd_reader *reader = omf_calloc(1, sizeof(sd_reader));
 
     reader->sd_errno = 0;
+    reader->refcount = 1;
 
     // Attempt to open file (note: Binary mode!)
     reader->handle = fopen(file, "rb");
@@ -47,6 +49,10 @@ error:
     return NULL;
 }
 
+void sd_reader_addref(sd_reader *reader) {
+    reader->refcount++;
+}
+
 long sd_reader_filesize(const sd_reader *reader) {
     return reader->filesize;
 }
@@ -56,8 +62,11 @@ int sd_reader_errno(const sd_reader *reader) {
 }
 
 void sd_reader_close(sd_reader *reader) {
-    fclose(reader->handle);
-    omf_free(reader);
+    reader->refcount--;
+    if(reader->refcount == 0) {
+        fclose(reader->handle);
+        omf_free(reader);
+    }
 }
 
 int sd_reader_set(sd_reader *reader, long offset) {

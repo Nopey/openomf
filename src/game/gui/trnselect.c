@@ -25,7 +25,7 @@ typedef struct {
 static void trnselect_render(component *c) {
     trnselect *g = widget_get_obj(c);
 
-    video_draw(g->img->data, c->x + g->img->pos.x, c->y + g->img->pos.y);
+    video_draw(sprite_get_surface(g->img), c->x + g->img->pos.x, c->y + g->img->pos.y);
     if(g->label) {
         component_render(g->label);
     }

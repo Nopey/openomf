@@ -261,7 +261,7 @@ component *lab_menu_main_create(scene *s, bool character_loaded) {
 
     // Initialize menu, and set button sheet
     sprite *msprite = animation_get_sprite(main_sheets, 2);
-    component *menu = trnmenu_create(msprite->data, msprite->pos.x, msprite->pos.y, false);
+    component *menu = trnmenu_create(sprite_get_surface(msprite), msprite->pos.x, msprite->pos.y, false);
 
     // Default text configuration
     text_settings tconf;
@@ -283,6 +283,7 @@ component *lab_menu_main_create(scene *s, bool character_loaded) {
         tconf.direction = details_list[i].dir;
 
         sprite *bsprite = animation_get_sprite(main_buttons, i);
+        surface *bsurf = sprite_get_surface(bsprite);
         bool enabled = details_list[i].enabled;
         if(i == 4) {
             if(sg_count() > 0) {
@@ -292,9 +293,8 @@ component *lab_menu_main_create(scene *s, bool character_loaded) {
         } else if(details_list[i].enabled == COM_DISABLED && character_loaded == true) {
             enabled = COM_ENABLED;
         }
-        component *button =
-            spritebutton_create(&tconf, details_list[i].text, bsprite->data, enabled, details_list[i].cb, s);
-        component_set_size_hints(button, bsprite->data->w, bsprite->data->h);
+        component *button = spritebutton_create(&tconf, details_list[i].text, bsurf, enabled, details_list[i].cb, s);
+        component_set_size_hints(button, bsurf->w, bsurf->h);
         component_set_pos_hints(button, bsprite->pos.x, bsprite->pos.y);
 
         spritebutton_set_focus_cb(button, focus_cbs[i]);

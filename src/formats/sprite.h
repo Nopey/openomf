@@ -33,6 +33,8 @@ typedef struct {
     uint16_t height; ///< Pixel height of the sprite
     uint16_t len;    ///< Byte length of the packed sprite data
     char *data;      ///< Packed sprite data
+    sd_reader *file;
+    long file_pos;
 } sd_sprite;
 
 /*! \brief Initialize sprite structure
@@ -116,7 +118,7 @@ int sd_sprite_rgba_decode(sd_rgba_image *dst, const sd_sprite *src, const vga_pa
  * \param dst Destination VGA image struct pointer.
  * \param src Source sprite image pointer
  */
-int sd_sprite_vga_decode(sd_vga_image *dst, const sd_sprite *src);
+int sd_sprite_vga_decode(sd_vga_image *dst, sd_sprite *src);
 
 /*! \brief Encode sprite from VGA image format.
  *
@@ -132,5 +134,7 @@ int sd_sprite_vga_encode(sd_sprite *dst, const sd_vga_image *src);
 
 int sd_sprite_load(sd_reader *reader, sd_sprite *sprite);
 int sd_sprite_save(sd_writer *writer, const sd_sprite *sprite);
+
+char *sd_sprite_get_data(sd_sprite *sprite);
 
 #endif // SD_SPRITE_H

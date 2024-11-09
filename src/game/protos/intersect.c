@@ -127,7 +127,7 @@ int intersect_sprite_hitpoint(object *obj, object *target, int level, vec2i *poi
             continue;
 
         // Get hitpixel
-        surface *sfc = target_sprite->data;
+        surface *sfc = sprite_get_surface(target_sprite);
         int hitpoint = (ycoord * sfc->w) + xcoord;
         if(target_dir == OBJECT_FACE_LEFT) {
             hitpoint = (ycoord * sfc->w) + (sfc->w - xcoord);

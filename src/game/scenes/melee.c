@@ -641,7 +641,7 @@ static void load_pilot_portraits(scene *scene, melee_local *local) {
         current = animation_get_sprite(pilots_enabled, i);
         target->x = current->pos.x;
         target->y = current->pos.y;
-        surface_create_from(&target->enabled, current->data);
+        surface_create_from(&target->enabled, sprite_get_surface(current));
 
         // Copy the face image in dimmed color (shown when not selected)
         surface_create_from(&target->disabled, &target->enabled);
@@ -676,7 +676,7 @@ static void load_har_portraits(scene *scene, melee_local *local) {
         current = animation_get_sprite(har_portraits, 0);
         target->x = current->pos.x + 62 * col;
         target->y = current->pos.y + 42 * row;
-        surface_create_from_surface(&target->enabled, 51, 36, 62 * col, 42 * row, current->data);
+        surface_create_from_surface(&target->enabled, 51, 36, 62 * col, 42 * row, sprite_get_surface(current));
         surface_set_transparency(&target->enabled, 0xD0);
 
         // Copy the enabled image, and compress the colors to grayscale

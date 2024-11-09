@@ -35,6 +35,12 @@ int sd_sprite_copy(sd_sprite *dst, const sd_sprite *src) {
         memcpy(dst->data, src->data, src->len);
     }
 
+    if(src->file != NULL) {
+        dst->file = src->file;
+        sd_reader_addref(src->file);
+        dst->file_pos = src->file_pos;
+    }
+
     return SD_SUCCESS;
 }
 
@@ -46,6 +52,10 @@ void sd_sprite_free(sd_sprite *sprite) {
     // AND sprite data belongs to this sprite
     if(sprite->data != NULL && !sprite->missing) {
         omf_free(sprite->data);
+    }
+
+    if(sprite->file != NULL) {
+        sd_reader_close(sprite->file);
     }
 }
 
@@ -60,8 +70,10 @@ int sd_sprite_load(sd_reader *r, sd_sprite *sprite) {
 
     // Copy sprite data, if there is any.
     if(sprite->missing == 0) {
-        sprite->data = omf_calloc(sprite->len, 1);
-        sd_read_buf(r, sprite->data, sprite->len);
+        sprite->file_pos = sd_reader_pos(r);
+        sprite->file = r;
+        sd_reader_addref(r);
+        sd_skip(r, sprite->len);
     } else {
         sprite->data = NULL;
     }
@@ -84,9 +96,29 @@ int sd_sprite_save(sd_writer *w, const sd_sprite *sprite) {
     sd_write_ubyte(w, sprite->index);
     sd_write_ubyte(w, sprite->missing);
     if(!sprite->missing) {
+        sd_sprite_get_data(sprite);
         sd_write_buf(w, sprite->data, sprite->len);
     }
     return SD_SUCCESS;
+}
+
+char *sd_sprite_get_data(sd_sprite *sprite) {
+    if(sprite->data)
+        return sprite->data;
+
+    if(!sprite->file)
+        return NULL;
+
+    sd_reader *r = sprite->file;
+    sprite->file = NULL;
+    sd_reader_set(r, sprite->file_pos);
+
+    sprite->data = omf_calloc(sprite->len, 1);
+    sd_read_buf(r, sprite->data, sprite->len);
+
+    sd_reader_close(r);
+
+    return sprite->data;
 }
 
 int sd_sprite_rgba_encode(sd_sprite *dst, const sd_rgba_image *src, const vga_palette *pal) {
@@ -264,7 +296,9 @@ int sd_sprite_rgba_decode(sd_rgba_image *dst, const sd_sprite *src, const vga_pa
     return SD_SUCCESS;
 }
 
-int sd_sprite_vga_decode(sd_vga_image *dst, const sd_sprite *src) {
+int sd_sprite_vga_decode(sd_vga_image *dst, sd_sprite *src) {
+    sd_sprite_get_data(src);
+
     uint16_t x = 0;
     uint16_t y = 0;
     int i = 0;

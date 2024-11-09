@@ -33,7 +33,7 @@ component *lab_menu_confirm_create(scene *s, lab_menu_select_cb yes, void *yesda
 
     // Initialize menu, and set button sheet
     sprite *msprite = animation_get_sprite(main_sheets, 3);
-    component *menu = trnmenu_create(msprite->data, msprite->pos.x, msprite->pos.y, false);
+    component *menu = trnmenu_create(sprite_get_surface(msprite), msprite->pos.x, msprite->pos.y, false);
 
     // Default text configuration
     text_settings tconf;
@@ -57,10 +57,11 @@ component *lab_menu_confirm_create(scene *s, lab_menu_select_cb yes, void *yesda
     yesgo->data = yesdata;
 
     sprite *bsprite = animation_get_sprite(main_buttons, 0);
+    surface *bsurf = sprite_get_surface(bsprite);
     component *button =
-        spritebutton_create(&tconf, lang_get(229), bsprite->data, COM_ENABLED, lab_menu_confirm_yes, yesgo);
+        spritebutton_create(&tconf, lang_get(229), bsurf, COM_ENABLED, lab_menu_confirm_yes, yesgo);
 
-    component_set_size_hints(button, bsprite->data->w, bsprite->data->h);
+    component_set_size_hints(button, bsurf->w, bsurf->h);
     component_set_pos_hints(button, bsprite->pos.x, bsprite->pos.y);
     trnmenu_attach(menu, button);
 
@@ -69,9 +70,9 @@ component *lab_menu_confirm_create(scene *s, lab_menu_select_cb yes, void *yesda
     nogo->data = nodata;
 
     bsprite = animation_get_sprite(main_buttons, 1);
-    button = spritebutton_create(&tconf, lang_get(228), bsprite->data, COM_ENABLED, lab_menu_confirm_no, nogo);
+    button = spritebutton_create(&tconf, lang_get(228), bsurf, COM_ENABLED, lab_menu_confirm_no, nogo);
 
-    component_set_size_hints(button, bsprite->data->w, bsprite->data->h);
+    component_set_size_hints(button, bsurf->w, bsurf->h);
     component_set_pos_hints(button, bsprite->pos.x, bsprite->pos.y);
     trnmenu_attach(menu, button);
 

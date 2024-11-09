@@ -185,7 +185,7 @@ component *lab_menu_training_create(scene *s) {
 
     // Initialize menu, and set button sheet
     sprite *msprite = animation_get_sprite(main_sheets, 1);
-    component *menu = trnmenu_create(msprite->data, msprite->pos.x, msprite->pos.y, false);
+    component *menu = trnmenu_create(sprite_get_surface(msprite), msprite->pos.x, msprite->pos.y, false);
 
     // Default text configuration
     text_settings tconf;
@@ -207,9 +207,10 @@ component *lab_menu_training_create(scene *s) {
         tconf.direction = details_list[i].dir;
 
         sprite *bsprite = animation_get_sprite(main_buttons, i);
+        surface *bsurf = sprite_get_surface(bsprite);
         component *button =
-            spritebutton_create(&tconf, details_list[i].text, bsprite->data, COM_ENABLED, details_list[i].cb, s);
-        component_set_size_hints(button, bsprite->data->w, bsprite->data->h);
+            spritebutton_create(&tconf, details_list[i].text, bsurf, COM_ENABLED, details_list[i].cb, s);
+        component_set_size_hints(button, bsurf->w, bsurf->h);
         component_set_pos_hints(button, bsprite->pos.x, bsprite->pos.y);
 
         if(i == 0) {

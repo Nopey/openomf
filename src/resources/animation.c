@@ -43,7 +43,7 @@ void animation_create(animation *ani, array *sprites, void *src, int id) {
             // read the right index from the sprite table
             tmp_sprite = omf_calloc(1, sizeof(sprite));
             sprite_create_reference(tmp_sprite, (void *)sdani->sprites[i], i,
-                                    ((sprite *)array_get(sprites, sdani->sprites[i]->index))->data);
+                                    sprite_get_surface((sprite *)array_get(sprites, sdani->sprites[i]->index)));
             sprite_reference spr;
             spr.sprite = tmp_sprite;
             vector_append(&ani->sprites, &spr);

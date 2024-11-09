@@ -333,7 +333,7 @@ void object_render(object *obj) {
         return;
 
     // Set current surface
-    obj->cur_surface = cur_sprite->data;
+    obj->cur_surface = sprite_get_surface(cur_sprite);
 
     // Something to ease the pain ...
     player_sprite_state *rstate = &obj->sprite_state;
@@ -427,8 +427,9 @@ void object_render_shadow(object *obj) {
     // Scale of the sprite on Y axis should be less than the
     // height of the sprite because of light position
     float scale_y = 0.25f;
-    int w = cur_sprite->data->w;
-    int h = cur_sprite->data->h;
+    surface *cur_surf = sprite_get_surface(cur_sprite);
+    int w = cur_surf->w;
+    int h = cur_surf->h;
     int scaled_h = h * scale_y;
 
     // Determine X
@@ -453,7 +454,8 @@ void object_render_shadow(object *obj) {
     // Render shadow object twice with different offsets, so that
     // the shadows seem a bit blobbier and shadow-y
     for(int i = 0; i < 2; i++) {
-        video_draw_full(cur_sprite->data, x + i, y + i, w, scaled_h, 2, 1, obj->pal_offset, obj->pal_limit, opacity,
+        video_draw_full(sprite_get_surface(cur_sprite), x + i, y + i, w, scaled_h, 2, 1, obj->pal_offset,
+                        obj->pal_limit, opacity,
                         flip_mode, SPRITE_MASK);
     }
 }

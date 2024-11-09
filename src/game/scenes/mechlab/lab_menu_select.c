@@ -48,7 +48,7 @@ component *lab_menu_select_create(scene *s, lab_menu_select_cb select, void *sel
 
     // Initialize menu, and set button sheet
     sprite *msprite = animation_get_sprite(main_sheets, 4);
-    component *menu = trnmenu_create(msprite->data, msprite->pos.x, msprite->pos.y, return_hand);
+    component *menu = trnmenu_create(sprite_get_surface(msprite), msprite->pos.x, msprite->pos.y, return_hand);
 
     // Default text configuration
     text_settings tconf;
@@ -72,10 +72,11 @@ component *lab_menu_select_create(scene *s, lab_menu_select_cb select, void *sel
     tconf.direction = TEXT_HORIZONTAL;
 
     sprite *bsprite = animation_get_sprite(main_buttons, 0);
+    surface *bsurf = sprite_get_surface(bsprite);
     component *button =
-        spritebutton_create(&tconf, lang_get(223), bsprite->data, COM_ENABLED, lab_menu_select_choose, selector);
+        spritebutton_create(&tconf, lang_get(223), bsurf, COM_ENABLED, lab_menu_select_choose, selector);
 
-    component_set_size_hints(button, bsprite->data->w, bsprite->data->h);
+    component_set_size_hints(button, bsurf->w, bsurf->h);
     component_set_pos_hints(button, bsprite->pos.x, bsprite->pos.y);
     spritebutton_set_free_userdata(button, true);
     trnmenu_attach(menu, button);
@@ -85,8 +86,8 @@ component *lab_menu_select_create(scene *s, lab_menu_select_cb select, void *sel
     goleft->data = leftdata;
 
     bsprite = animation_get_sprite(main_buttons, 1);
-    button = spritebutton_create(&tconf, NULL, bsprite->data, COM_ENABLED, NULL, goleft);
-    component_set_size_hints(button, bsprite->data->w, bsprite->data->h);
+    button = spritebutton_create(&tconf, NULL, bsurf, COM_ENABLED, NULL, goleft);
+    component_set_size_hints(button, bsurf->w, bsurf->h);
     component_set_pos_hints(button, bsprite->pos.x, bsprite->pos.y);
     spritebutton_set_focus_cb(button, lab_menu_focus_left);
     spritebutton_set_free_userdata(button, true);
@@ -97,8 +98,8 @@ component *lab_menu_select_create(scene *s, lab_menu_select_cb select, void *sel
     goright->data = rightdata;
 
     bsprite = animation_get_sprite(main_buttons, 2);
-    button = spritebutton_create(&tconf, NULL, bsprite->data, COM_ENABLED, NULL, goright);
-    component_set_size_hints(button, bsprite->data->w, bsprite->data->h);
+    button = spritebutton_create(&tconf, NULL, bsurf, COM_ENABLED, NULL, goright);
+    component_set_size_hints(button, bsurf->w, bsurf->h);
     component_set_pos_hints(button, bsprite->pos.x, bsprite->pos.y);
     spritebutton_set_focus_cb(button, lab_menu_focus_right);
     spritebutton_set_free_userdata(button, true);

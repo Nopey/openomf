@@ -258,12 +258,13 @@ component *lab_menu_trade_create(scene *s) {
         tconf.direction = details_list[i].dir;
 
         sprite *bsprite = animation_get_sprite(main_buttons, i);
+        surface *bsurf = sprite_get_surface(bsprite);
         component *button =
-            spritebutton_create(&tconf, details_list[i].text, bsprite->data, COM_ENABLED, details_list[i].cb, s);
-        component_set_size_hints(button, bsprite->data->w, bsprite->data->h);
+            spritebutton_create(&tconf, details_list[i].text, bsurf, COM_ENABLED, details_list[i].cb, s);
+        component_set_size_hints(button, bsurf->w, bsurf->h);
         component_set_pos_hints(button, x + bsprite->pos.x, y + bsprite->pos.y);
 
-        x += bsprite->data->w;
+        x += bsurf->w;
 
         spritebutton_set_focus_cb(button, focus_cbs[i]);
         spritebutton_set_always_display(button);

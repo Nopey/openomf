@@ -22,7 +22,7 @@ component *lab_dash_newplayer_create(scene *s, newplayer_widgets *nw) {
     // Background name box
     animation *main_sheets = &bk_get_info(s->bk_data, 1)->ani;
     sprite *msprite = animation_get_sprite(main_sheets, 5);
-    xysizer_attach(xy, spriteimage_create(msprite->data), msprite->pos.x, msprite->pos.y, -1, -1);
+    xysizer_attach(xy, spriteimage_create(sprite_get_surface(msprite)), msprite->pos.x, msprite->pos.y, -1, -1);
 
     // Dialog text
     xysizer_attach(xy, label_create(&tconf, lang_get(192)), 110, 43, 100, 50);
