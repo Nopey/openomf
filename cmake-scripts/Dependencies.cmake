@@ -26,16 +26,19 @@ if(VCPKG_TOOLCHAIN)
 	target_link_libraries(openomf::xmp INTERFACE "$<IF:$<TARGET_EXISTS:libxmp::xmp_shared>,libxmp::xmp_shared,libxmp::xmp_static>")
 
 	find_package(Argtable3 CONFIG REQUIRED)
+	add_library(openomf::argtable INTERFACE IMPORTED)
+	target_link_libraries(openomf::argtable INTERFACE argtable3::argtable3)
+	target_compile_definitions(openomf::argtable INTERFACE ARGTABLE3_FOUND)
+
+	find_package(unofficial-enet CONFIG REQUIRED)
+	add_library(openomf::enet ALIAS unofficial::enet::enet)
+	
+	find_package(unofficial-libconfuse CONFIG REQUIRED)
+	add_library(openomf::confuse ALIAS unofficial::libconfuse::libconfuse)
 
 	# TODO: optional deps (miniupnpc and natpmp)
 	# find_package(miniupnpc CONFIG)
 	# find_package(natpmp CONFIG)
-
-	find_package(unofficial-enet CONFIG REQUIRED)
-	add_library(openomf::enet ALIAS unofficial::enet::enet)
-
-	find_package(confuse REQUIRED)
-	add_library(openomf::confuse ALIAS unofficial::libconfuse::libconfuse)
 else()
 	find_package(enet REQUIRED)
 	find_package(confuse REQUIRED)

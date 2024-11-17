@@ -160,17 +160,6 @@ set(COREINCS
 )
 
 if(ARGTABLE2_FOUND)
-  set(COREINCS ${COREINCS} ${ARGTABLE2_INCLUDE_DIR})
-  set(CORELIBS ${CORELIBS} ${ARGTABLE2_LIBRARY})
-  add_compile_definitions(ARGTABLE2_FOUND)
-elseif(Argtable3_FOUND)
-  set(CORELIBS ${CORELIBS} argtable3::argtable3)
-  add_compile_definitions(ARGTABLE3_FOUND)
-else()
-  message(FATAL_ERROR "Neither argtable2 or argtable3 was found")
-endif()
-
-if(ARGTABLE2_FOUND)
   set(CORELIBS ${CORELIBS} ${ARGTABLE2_LIBRARY})
 elseif(ARGTABLE3_FOUND)
   set(CORELIBS ${CORELIBS} ${ARGTABLE3_LIBRARY})
@@ -322,11 +311,11 @@ if(MINGW)
 endif()
 
 # Make sure libraries are linked
-target_link_libraries(openomf ${CORELIBS})
-target_link_libraries(openomf openomf::SDL2main openomf::epoxy)
+target_link_libraries(openomf PRIVATE ${CORELIBS})
+target_link_libraries(openomf PRIVATE openomf::argtable openomf::SDL2main openomf::epoxy)
 foreach(TARGET ${TOOL_TARGET_NAMES})
     target_link_libraries(${TARGET} PRIVATE ${CORELIBS})
-    target_link_libraries(${TARGET} PRIVATE openomf::SDL2main openomf::epoxy)
+    target_link_libraries(${TARGET} PRIVATE openomf::argtable openomf::SDL2main openomf::epoxy)
 endforeach()
 
 # Testing stuff
