@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(OpenOMF C)
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake-scripts)
+# temporarily disable all in-tree FindXYZ.cmake scripts
+# set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake-scripts)
 
 INCLUDE(CheckFunctionExists)
 INCLUDE(CheckSymbolExists)
@@ -93,6 +94,9 @@ if(WIN32)
     endif()
 endif()
 
+# openomf core dependencies
+include("cmake-scripts/Dependencies.cmake")
+
 # Find OpenOMF core sources
 file(GLOB_RECURSE OPENOMF_SRC
     LIST_DIRECTORIES OFF
@@ -109,7 +113,16 @@ omf_target_precompile_headers(openomf_core PUBLIC
     "<enet/enet.h>"
     "<epoxy/gl.h>"
 )
-set(CORELIBS openomf_core ${CORELIBS})
+target_link_libraries(openomf_core PRIVATE
+    openomf::SDL2_mixer
+    openomf::xmp
+    openomf::confuse
+    openomf::enet
+    openomf::png
+    openomf::epoxy
+    openomf::SDL2
+)
+list(APPEND CORELIBS openomf_core)
 
 if(WIN32 AND NOT MINGW)
     omf_target_precompile_headers(openomf_core PUBLIC
@@ -122,30 +135,9 @@ if(WIN32)
     SET(ICON_RESOURCE "resources/icons/openomf.rc")
 endif()
 
-# openomf core dependencies (hard dependencies)
-find_package(SDL2 REQUIRED)
-find_package(SDL2_mixer REQUIRED)
-find_package(xmp REQUIRED)
-find_package(Epoxy REQUIRED)
-find_package(enet)
-find_package(confuse)
-find_package(argtable2)
-find_package(Argtable3 CONFIG)
-find_package(PNG)
-find_package(ZLIB)
-find_package(miniupnpc)
-find_package(natpmp)
-
-target_link_libraries(openomf_core PRIVATE ${XMP_LIBRARY})
-
 # Check functions and generate platform configuration file
 check_symbol_exists(strdup "string.h" HAVE_STD_STRDUP)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/platform.h.in ${CMAKE_CURRENT_BINARY_DIR}/src/platform.h)
-
-# If tests are enabled, find CUnit
-if(USE_TESTS)
-    find_package(CUnit REQUIRED)
-endif()
 
 # Only strip on GCC (clang does not appreciate)
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
@@ -165,13 +157,6 @@ set(COREINCS
     ${ENET_INCLUDE_DIR}
     ${PNG_INCLUDE_DIR}
     ${ZLIB_INCLUDE_DIR}
-)
-
-set(CORELIBS
-    ${CONFUSE_LIBRARY}
-    ${ENET_LIBRARY}
-    ${PNG_LIBRARY}
-    ${ZLIB_LIBRARY}
 )
 
 if(ARGTABLE2_FOUND)
@@ -338,10 +323,10 @@ endif()
 
 # Make sure libraries are linked
 target_link_libraries(openomf ${CORELIBS})
-target_link_libraries(openomf SDL2::Main SDL2::Mixer Epoxy::Main)
+target_link_libraries(openomf openomf::SDL2main openomf::epoxy)
 foreach(TARGET ${TOOL_TARGET_NAMES})
-    target_link_libraries(${TARGET} ${CORELIBS})
-    target_link_libraries(${TARGET} SDL2::Main SDL2::Mixer Epoxy::Main)
+    target_link_libraries(${TARGET} PRIVATE ${CORELIBS})
+    target_link_libraries(${TARGET} PRIVATE openomf::SDL2main openomf::epoxy)
 endforeach()
 
 # Testing stuff
@@ -364,7 +349,7 @@ if(CUNIT_FOUND)
     target_compile_definitions(openomf_test_main PRIVATE
                                TESTS_ROOT_DIR="${CMAKE_SOURCE_DIR}/testing")
 
-    target_link_libraries(openomf_test_main ${CORELIBS} SDL2::Main SDL2::Mixer Epoxy::Main)
+    target_link_libraries(openomf_test_main ${CORELIBS} openomf::SDL2main openomf::epoxy)
 
     if(MSVC)
         target_precompile_headers(openomf_test_main PRIVATE "<stdio.h>")
