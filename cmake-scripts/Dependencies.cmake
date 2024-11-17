@@ -44,6 +44,19 @@ else()
 	find_package(confuse REQUIRED)
 endif()
 
+# TODO: miniupnpc
+# if(MINIUPNPC_FOUND)
+#     set(CORELIBS ${CORELIBS} ${MINIUPNPC_LIBRARY})
+#     set(COREINCS ${COREINCS} ${MINIUPNPC_INCLUDE_DIR})
+#     add_compile_definitions(MINIUPNPC_FOUND)
+# endif()
+#
+# if(LIBNATPMP_FOUND)
+#     set(CORELIBS ${CORELIBS} ${LIBNATPMP_LIBRARY})
+#     set(COREINCS ${COREINCS} ${LIBNATPMP_INCLUDE_DIR})
+#     add_compile_definitions(NATPMP_FOUND)
+# endif()
+
 #---------
 # dependencies that unconditionally use cmake module search
 #---------
@@ -59,6 +72,9 @@ target_include_directories(openomf::png INTERFACE ${PNG_INCLUDE_DIRS})
 # If tests are enabled, find CUnit
 if(USE_TESTS)
     find_package(CUnit REQUIRED)
+	add_library(openomf::cunit INTERFACE IMPORTED)
+	target_link_libraries(openomf::cunit INTERFACE ${CUNIT_LIBRARY})
+	target_include_directories(openomf::cunit INTERFACE ${CUNIT_INCLUDE_DIR})
 endif()
 
 

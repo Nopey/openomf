@@ -148,34 +148,7 @@ endif()
 set(COREINCS
     src
     ${CMAKE_CURRENT_BINARY_DIR}/src/
-    ${SDL2_INCLUDE_DIRS}
-    ${SDL2_MIXER_INCLUDE_DIRS}
-    ${OPENGL_INCLUDE_DIR}
-    ${EPOXY_INCLUDE_DIR}
-    ${CONFUSE_INCLUDE_DIR}
-    ${XMP_INCLUDE_DIR}
-    ${ENET_INCLUDE_DIR}
-    ${PNG_INCLUDE_DIR}
-    ${ZLIB_INCLUDE_DIR}
 )
-
-if(ARGTABLE2_FOUND)
-  set(CORELIBS ${CORELIBS} ${ARGTABLE2_LIBRARY})
-elseif(ARGTABLE3_FOUND)
-  set(CORELIBS ${CORELIBS} ${ARGTABLE3_LIBRARY})
-endif()
-
-if(MINIUPNPC_FOUND)
-    set(CORELIBS ${CORELIBS} ${MINIUPNPC_LIBRARY})
-    set(COREINCS ${COREINCS} ${MINIUPNPC_INCLUDE_DIR})
-    add_compile_definitions(MINIUPNPC_FOUND)
-endif()
-
-if(LIBNATPMP_FOUND)
-    set(CORELIBS ${CORELIBS} ${LIBNATPMP_LIBRARY})
-    set(COREINCS ${COREINCS} ${LIBNATPMP_INCLUDE_DIR})
-    add_compile_definitions(NATPMP_FOUND)
-endif()
 
 # MingW build should add mingw32 lib
 if(MINGW)
@@ -322,9 +295,6 @@ endforeach()
 if(CUNIT_FOUND)
     enable_testing()
 
-    include_directories(${CUNIT_INCLUDE_DIR} testing/ src/)
-    SET(CORELIBS ${CORELIBS} ${CUNIT_LIBRARY})
-
     file(GLOB_RECURSE TEST_SRC
         LIST_DIRECTORIES OFF
         CONFIGURE_DEPENDS
@@ -338,7 +308,8 @@ if(CUNIT_FOUND)
     target_compile_definitions(openomf_test_main PRIVATE
                                TESTS_ROOT_DIR="${CMAKE_SOURCE_DIR}/testing")
 
-    target_link_libraries(openomf_test_main ${CORELIBS} openomf::SDL2main openomf::epoxy)
+    target_include_directories(openomf_test_main PRIVATE testing/ src/)
+    target_link_libraries(openomf_test_main ${CORELIBS} openomf::SDL2main openomf::epoxy openomf::cunit)
 
     if(MSVC)
         target_precompile_headers(openomf_test_main PRIVATE "<stdio.h>")
