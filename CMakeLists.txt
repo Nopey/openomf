@@ -93,10 +93,39 @@ if(WIN32)
     endif()
 endif()
 
-# System packages (hard dependencies)
+# Find OpenOMF core sources
+file(GLOB_RECURSE OPENOMF_SRC
+    LIST_DIRECTORIES OFF
+    CONFIGURE_DEPENDS
+    RELATIVE ${CMAKE_SOURCE_DIR}
+    "src/*/*.c" "src/*/*.h"
+)
+
+# Build core sources first as an object library
+# this can then be reused in tests and main executable to speed things up
+add_library(openomf_core OBJECT ${OPENOMF_SRC})
+omf_target_precompile_headers(openomf_core PUBLIC
+    "<SDL.h>"
+    "<enet/enet.h>"
+    "<epoxy/gl.h>"
+)
+set(CORELIBS openomf_core ${CORELIBS})
+
+if(WIN32 AND NOT MINGW)
+    omf_target_precompile_headers(openomf_core PUBLIC
+        "<windows.h>"
+    )
+endif()
+
+# Set icon for windows executable
+if(WIN32)
+    SET(ICON_RESOURCE "resources/icons/openomf.rc")
+endif()
+
+# openomf core dependencies (hard dependencies)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_mixer REQUIRED)
-find_package(xmp)
+find_package(xmp REQUIRED)
 find_package(Epoxy REQUIRED)
 find_package(enet)
 find_package(confuse)
@@ -107,7 +136,7 @@ find_package(ZLIB)
 find_package(miniupnpc)
 find_package(natpmp)
 
-
+target_link_libraries(openomf_core PRIVATE ${XMP_LIBRARY})
 
 # Check functions and generate platform configuration file
 check_symbol_exists(strdup "string.h" HAVE_STD_STRDUP)
@@ -123,14 +152,6 @@ if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Wl,-s")
     set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} -Wl,-s")
 endif()
-
-# Find OpenOMF core sources
-file(GLOB_RECURSE OPENOMF_SRC
-    LIST_DIRECTORIES OFF
-    CONFIGURE_DEPENDS
-    RELATIVE ${CMAKE_SOURCE_DIR}
-    "src/*/*.c" "src/*/*.h"
-)
 
 set(COREINCS
     src
@@ -199,28 +220,6 @@ endif()
 
 # Set include directories for all builds
 include_directories(${COREINCS})
-
-# Build core sources first as an object library
-# this can then be reused in tests and main executable to speed things up
-add_library(openomf_core OBJECT ${OPENOMF_SRC})
-target_link_libraries(openomf_core PRIVATE ${XMP_LIBRARY})
-omf_target_precompile_headers(openomf_core PUBLIC
-    "<SDL.h>"
-    "<enet/enet.h>"
-    "<epoxy/gl.h>"
-)
-set(CORELIBS openomf_core ${CORELIBS})
-
-if(WIN32 AND NOT MINGW)
-    omf_target_precompile_headers(openomf_core PUBLIC
-        "<windows.h>"
-    )
-endif()
-
-# Set icon for windows executable
-if(WIN32)
-    SET(ICON_RESOURCE "resources/icons/openomf.rc")
-endif()
 
 # Build the game binary
 add_executable(openomf src/main.c src/engine.c ${ICON_RESOURCE})
