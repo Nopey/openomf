@@ -6,6 +6,7 @@
 set(ORIGINAL_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake-scripts)
 
+
 # SDL2, SDL2_mixer
 if(VCPKG_TOOLCHAIN)
 	find_package(SDL2 CONFIG REQUIRED)
@@ -112,16 +113,11 @@ if(USE_NATPMP)
 	endif()
 endif()
 
-#---------
-# dependencies that unconditionally use cmake module search
-#---------
+find_package(PNG REQUIRED)
+add_library(openomf::png ALIAS PNG::PNG)
+
 find_package(Epoxy REQUIRED)
 # openomf::epoxy is defined in our FindEpoxy.cmake
-
-find_package(PNG REQUIRED)
-add_library(openomf::png INTERFACE IMPORTED)
-target_link_libraries(openomf::png INTERFACE ${PNG_LIBRARIES})
-target_include_directories(openomf::png INTERFACE ${PNG_INCLUDE_DIRS})
 
 if(USE_TESTS)
     find_package(CUnit REQUIRED)
