@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.16)
-project(OpenOMF C)
 # temporarily disable all in-tree FindXYZ.cmake scripts
 # set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake-scripts)
 
@@ -17,6 +16,22 @@ OPTION(USE_TOOLS "Build tools" OFF)
 OPTION(USE_SANITIZERS "Enable Asan and Ubsan" OFF)
 OPTION(USE_TIDY "Use clang-tidy for checks" OFF)
 OPTION(USE_FORMAT "Use clang-format for checks" OFF)
+
+OPTION(USE_MINIUPNPC "Use miniupnpc for port forwarding" OFF)
+OPTION(USE_NATPMP "Use natpmp for port forwarding" OFF)
+
+# configure vcpkg features before project()
+if(USE_TESTS)
+    list(APPEND VCPKG_MANIFEST_FEATURES use-tests)
+endif()
+if(USE_MINIUPNPC)
+    list(APPEND VCPKG_MANIFEST_FEATURES miniupnpc)
+endif()
+if(USE_NATPMP)
+    list(APPEND VCPKG_MANIFEST_FEATURES natpmp)
+endif()
+
+project(OpenOMF C)
 
 set(USE_PCH ON)
 # clang-tidy only works with clang when PCH is enabled
@@ -122,6 +137,16 @@ target_link_libraries(openomf_core PRIVATE
     openomf::epoxy
     openomf::SDL2
 )
+if(USE_MINIUPNPC)
+    target_link_libraries(openomf_core PUBLIC
+        openomf::miniupnpc
+    )
+endif()
+if(USE_NATPMP)
+    target_link_libraries(openomf_core PUBLIC
+        openomf::natpmp
+    )
+endif()
 list(APPEND CORELIBS openomf_core)
 
 if(WIN32 AND NOT MINGW)
