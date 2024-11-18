@@ -1,11 +1,10 @@
-# temporarily set these? ehh
+# Dependencies.cmake
+# this file locates all third party dependencies, and creates easy to use
+# targets like `openomf::argtable` for the openomf build scripts to link to.
+
+# set module path only temporarily, to discourage find_package being used outside of this script
 set(ORIGINAL_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake-scripts)
-
-if(NOT VCPKG_TOOLCHAIN)
-	message(WARNING "TODO: Dependencies.cmake for non-vcpkg builds")
-	# SDL2, etc..
-endif()
 
 # SDL2, SDL2_mixer
 if(VCPKG_TOOLCHAIN)

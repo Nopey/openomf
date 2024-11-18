@@ -1,6 +1,4 @@
 cmake_minimum_required(VERSION 3.16)
-# temporarily disable all in-tree FindXYZ.cmake scripts
-# set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake-scripts)
 
 INCLUDE(CheckFunctionExists)
 INCLUDE(CheckSymbolExists)
@@ -20,7 +18,7 @@ OPTION(USE_FORMAT "Use clang-format for checks" OFF)
 OPTION(USE_MINIUPNPC "Use miniupnpc for port forwarding" OFF)
 OPTION(USE_NATPMP "Use natpmp for port forwarding" OFF)
 
-# configure vcpkg features before project()
+# vcpkg features must be set before project()
 if(USE_TESTS)
     list(APPEND VCPKG_MANIFEST_FEATURES use-tests)
 endif()
@@ -129,13 +127,13 @@ omf_target_precompile_headers(openomf_core PUBLIC
     "<epoxy/gl.h>"
 )
 target_link_libraries(openomf_core PRIVATE
-    openomf::SDL2_mixer
-    openomf::xmp
     openomf::confuse
     openomf::enet
-    openomf::png
     openomf::epoxy
+    openomf::png
     openomf::SDL2
+    openomf::SDL2_mixer
+    openomf::xmp
 )
 if(USE_MINIUPNPC)
     target_link_libraries(openomf_core PUBLIC
