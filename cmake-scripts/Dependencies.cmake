@@ -117,7 +117,10 @@ find_package(PNG REQUIRED)
 add_library(openomf::png ALIAS PNG::PNG)
 
 find_package(Epoxy REQUIRED)
-# openomf::epoxy is defined in our FindEpoxy.cmake
+add_library(openomf::epoxy UNKNOWN IMPORTED)
+set_target_properties(openomf::epoxy PROPERTIES
+    IMPORTED_LOCATION "${EPOXY_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${EPOXY_INCLUDE_DIR}")
 
 if(USE_TESTS)
     find_package(CUnit REQUIRED)
