@@ -1,6 +1,7 @@
 macro(openomf_strings)
     # strings new in OpenOMF
     openomf_string(LangLanguage "Language name")
+    openomf_string(LangEncoding "LNG Text Encoding")
 endmacro()
 
 macro(base_strings)

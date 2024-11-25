@@ -1975,3 +1975,9 @@ ID: 457
 Title: Translation Name
 Data: Dansk
 Maskinoversottelse
+
+ID: 458
+Title: LNG Text Encoding
+# utf-8 or cp437.
+# utf-8 is not currently supported, as we have no utf-8 text rendering.
+Data: cp437
