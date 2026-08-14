@@ -7,7 +7,7 @@
 #include "formats/error.h"
 #include "formats/fonts.h"
 #include "utils/c_array_util.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <argtable3.h>
 #include <stdint.h>
 #include <string.h>

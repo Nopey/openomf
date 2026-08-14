@@ -2,11 +2,11 @@
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "dependencies": [
     {
-      "name": "sdl2",
+      "name": "sdl3",
       "default-features": false
     },
     {
-      "name": "sdl2",
+      "name": "sdl3",
       "default-features": false,
       "platform": "linux",
       "features": [
@@ -15,7 +15,7 @@
       ]
     },
     {
-      "name": "sdl2-mixer",
+      "name": "sdl3-mixer",
       "default-features": false
     },
     "libxmp",

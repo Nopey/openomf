@@ -35,4 +35,4 @@ OpenOMF uses these, in priority order:
 ## Sources
 
 [1] https://wiki.archlinux.org/title/XDG_Base_Directory
-[2] https://wiki.libsdl.org/SDL2/SDL_GetPrefPath
+[2] https://wiki.libsdl.org/SDL3/SDL_GetPrefPath

@@ -249,9 +249,9 @@ int main(int argc, char *argv[]) {
         settings_get()->net.net_listen_port_start = listen_port;
     }
 
-    // Init SDL2
+    // Init SDL
     if(SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO)) {
-        err_msgbox("SDL2 Initialization failed: %s", SDL_GetError());
+        err_msgbox("SDL Initialization failed: %s", SDL_GetError());
         goto exit_2;
     }
     SDL_version sdl_linked;

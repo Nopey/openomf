@@ -66,7 +66,7 @@ struct component {
     const gui_theme *theme; ///< Theme object. After init, this should be set for all objects.
 
     component_render_cb render; ///< Render function callback. This tells the component to draw itself.
-    component_event_cb event;   ///< Event function callback. Direct SDL2 event handler.
+    component_event_cb event;   ///< Event function callback. Direct SDL event handler.
     component_action_cb action; ///< Action function callback. Handles OpenOMF abstract key events.
     component_focus_cb focus;   ///< Focus function callback. Handles OpenOMF focus events.
     component_layout_cb layout; ///< Layout function callback. This is called after the component tree is created. Sets

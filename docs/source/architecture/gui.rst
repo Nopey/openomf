@@ -59,7 +59,7 @@ Components use function pointers for lifecycle operations, allowing specializati
 Callback      Purpose
 ============  ==================================================================
 ``render``    Draw the component to screen
-``event``     Handle raw SDL2 events (keyboard, mouse)
+``event``     Handle raw SDL events (keyboard, mouse)
 ``action``    Handle abstract game actions (ACT_UP, ACT_KICK, etc.)
 ``focus``     Called when focus state changes
 ``layout``    Calculate and apply position/size
