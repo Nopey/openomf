@@ -216,7 +216,7 @@ target_compile_definitions(openomf_core PUBLIC
     "$<$<BOOL:${USE_EXTENDED_PALETTE}>:USE_EXTENDED_PALETTE>"
 )
 omf_target_precompile_headers(openomf_core PUBLIC
-    "<SDL.h>"
+    "<SDL3/SDL.h>"
     "<enet/enet.h>"
     "<epoxy/gl.h>"
 )
@@ -229,8 +229,8 @@ target_link_libraries(openomf_core PRIVATE
     openomf::confuse
     openomf::enet
     openomf::epoxy
-    openomf::SDL2
-    openomf::SDL2_mixer
+    openomf::SDL3
+    openomf::SDL3_mixer
     openomf::xmp
 )
 
@@ -425,10 +425,10 @@ endif()
 
 # Make sure libraries are linked
 target_link_libraries(openomf PRIVATE ${CORELIBS})
-target_link_libraries(openomf PRIVATE openomf::argtable openomf::zip openomf::SDL2main openomf::epoxy)
+target_link_libraries(openomf PRIVATE openomf::argtable openomf::zip openomf::epoxy)
 foreach(TARGET ${TOOL_TARGET_NAMES})
     target_link_libraries(${TARGET} PRIVATE ${CORELIBS})
-    target_link_libraries(${TARGET} PRIVATE openomf::argtable openomf::zip openomf::SDL2main openomf::epoxy)
+    target_link_libraries(${TARGET} PRIVATE openomf::argtable openomf::zip openomf::epoxy)
 endforeach()
 
 # Testing stuff
@@ -449,7 +449,7 @@ if(CUNIT_FOUND)
                                TESTS_ROOT_DIR="${CMAKE_SOURCE_DIR}/testing")
 
     target_include_directories(openomf_test_main PRIVATE testing/ src/)
-    target_link_libraries(openomf_test_main ${CORELIBS} openomf::SDL2main openomf::epoxy openomf::cunit)
+    target_link_libraries(openomf_test_main ${CORELIBS} openomf::epoxy openomf::cunit)
 
     if(MSVC)
         target_precompile_headers(openomf_test_main PRIVATE "<stdio.h>")

@@ -7,25 +7,13 @@ set(ORIGINAL_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake-scripts)
 
 
-# SDL2, SDL2_mixer
-add_library(openomf::SDL2 INTERFACE IMPORTED)
-add_library(openomf::SDL2main INTERFACE IMPORTED)
-add_library(openomf::SDL2_mixer INTERFACE IMPORTED)
-if(VCPKG_TOOLCHAIN)
-    find_package(SDL2 CONFIG REQUIRED)
-    target_link_libraries(openomf::SDL2 INTERFACE "$<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>")
-    target_link_libraries(openomf::SDL2main INTERFACE SDL2::SDL2main openomf::SDL2)
-
-    find_package(SDL2_mixer CONFIG REQUIRED)
-    target_link_libraries(openomf::SDL2_mixer INTERFACE "$<IF:$<TARGET_EXISTS:SDL2_mixer::SDL2_mixer>,SDL2_mixer::SDL2_mixer,SDL2_mixer::SDL2_mixer-static>")
-else()
-    find_package(SDL2 REQUIRED)
-    target_link_libraries(openomf::SDL2 INTERFACE SDL2::Core)
-    target_link_libraries(openomf::SDL2main INTERFACE SDL2::Main openomf::SDL2)
-
-    find_package(SDL2_mixer REQUIRED)
-    target_link_libraries(openomf::SDL2_mixer INTERFACE SDL2::Mixer)
-endif()
+# SDL3, SDL3_mixer
+add_library(openomf::SDL3 INTERFACE IMPORTED)
+add_library(openomf::SDL3_mixer INTERFACE IMPORTED)
+find_package(SDL3 REQUIRED)
+target_link_libraries(openomf::SDL3 INTERFACE SDL3::SDL3)
+find_package(SDL3_mixer REQUIRED)
+target_link_libraries(openomf::SDL3_mixer INTERFACE SDL3_mixer::SDL3_mixer)
 
 # xmp
 add_library(openomf::xmp INTERFACE IMPORTED)
