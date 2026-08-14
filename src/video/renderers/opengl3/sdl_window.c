@@ -5,8 +5,8 @@
 #include <epoxy/gl.h>
 #include <stdio.h>
 
-bool create_gl_context(SDL_GLContext **context, SDL_Window *window) {
-    SDL_GLContext *ctx = SDL_GL_CreateContext(window);
+bool create_gl_context(SDL_GLContext *context, SDL_Window *window) {
+    SDL_GLContext ctx = SDL_GL_CreateContext(window);
     if(ctx == NULL) {
         log_error("Could not acquire OpenGL context: %s", SDL_GetError());
         return false;
@@ -49,14 +49,14 @@ void ortho2d(GLfloat *matrix, float left, float right, float bottom, float top) 
 
 bool has_gl_available(int version_major, int version_minor) {
     SDL_Window *w;
-    SDL_GLContext *c;
+    SDL_GLContext c;
     bool ret = false;
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, version_major);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, version_minor);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-    if((w = SDL_CreateWindow("", 0, 0, 320, 200, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL)) == NULL) {
+    if((w = SDL_CreateWindow("", 320, 200, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL)) == NULL) {
         goto exit_0;
     }
     if((c = SDL_GL_CreateContext(w)) == NULL) {
@@ -88,11 +88,15 @@ bool create_window(SDL_Window **window, int width, int height, bool fullscreen) 
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 
-    SDL_Window *w = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
+    SDL_Window *w = SDL_CreateWindow(title, width, height,
                                      SDL_WINDOW_OPENGL);
     if(w == NULL) {
         log_error("Could not create window: %s", SDL_GetError());
         return false;
+    }
+    
+    if(!SDL_SetWindowPosition(w, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED)) {
+        log_warn("Failed to set window position");
     }
 
     if(fullscreen) {

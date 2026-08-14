@@ -24,7 +24,7 @@
 
 typedef struct gl3_context {
     SDL_Window *window;
-    SDL_GLContext *gl_context;
+    SDL_GLContext gl_context;
     texture_atlas *atlas;
     object_array *objects;
     gl_palette *palette;

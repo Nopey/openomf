@@ -14,7 +14,7 @@ typedef struct {
 } joystick_keys;
 
 typedef struct {
-    SDL_GameController *joy;
+    SDL_Gamepad *joy;
     SDL_Haptic *haptic;
     joystick_keys *keys;
     int rumble;
