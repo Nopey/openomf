@@ -9,7 +9,7 @@
 #include "utils/log.h"
 #include "video/vga_state.h"
 #include "video/video.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 // Colors specific to palette used by main menu
 #define TEXT_PRIMARY_COLOR 0xFE

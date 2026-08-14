@@ -7,7 +7,7 @@
 #include "game/utils/serial.h"
 #include "utils/random.h"
 #include "utils/vector.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <stdbool.h>
 
 typedef struct scene_t scene;

@@ -12,7 +12,7 @@
 
 #include "game/gui/text/text.h"
 #include "game/gui/theme.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 typedef struct component component;
 

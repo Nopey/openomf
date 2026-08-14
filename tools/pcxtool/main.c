@@ -3,7 +3,7 @@
 #include "utils/allocator.h"
 #include "utils/c_array_util.h"
 #include "utils/path.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <argtable3.h>
 #include <errno.h>
 #include <inttypes.h>

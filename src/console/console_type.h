@@ -4,7 +4,7 @@
 #include "game/gui/text/text.h"
 #include "game/protos/scene.h"
 #include "utils/str.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <stdbool.h>
 
 typedef struct console {

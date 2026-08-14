@@ -20,7 +20,7 @@
 #include "utils/time_fmt.h"
 #include "video/vga_state.h"
 #include "video/video.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <stdio.h>
 
 #define MAX_TICKS_PER_FRAME 10

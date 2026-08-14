@@ -9,7 +9,7 @@
 #include "formats/af.h"
 #include "formats/error.h"
 #include "utils/c_array_util.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <argtable3.h>
 #include <stdint.h>
 #include <string.h>

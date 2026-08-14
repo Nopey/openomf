@@ -1,4 +1,4 @@
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <inttypes.h>
 #include <math.h>
 #include <stdbool.h>

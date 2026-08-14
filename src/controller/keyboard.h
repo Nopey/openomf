@@ -2,7 +2,7 @@
 #define KEYBOARD_H
 
 #include "controller/controller.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #define KEYBOARD_INPUT_BUFFER_SIZE 16
 

@@ -35,7 +35,7 @@
 #include "video/enums.h"
 #include "video/vga_state.h"
 #include "video/video.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <limits.h>
 #include <math.h>
 #include <stdlib.h>

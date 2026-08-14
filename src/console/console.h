@@ -2,7 +2,7 @@
 #define CONSOLE_H
 
 #include "game/game_state_type.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <stdbool.h>
 
 // return 0 on success, otherwise return error code

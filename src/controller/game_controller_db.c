@@ -1,4 +1,4 @@
-#include <SDL_gamecontroller.h>
+#include <SDL3/SDL_gamepad.h>
 
 #include "resources/resource_files.h"
 #include "utils/log.h"

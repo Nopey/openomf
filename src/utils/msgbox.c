@@ -1,5 +1,5 @@
 #include "utils/msgbox.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <stdarg.h>
 #include <stdio.h>
 

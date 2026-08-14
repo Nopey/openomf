@@ -6,7 +6,7 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 
-#include <SDL_rect.h>
+#include <SDL3/SDL_rect.h>
 #include <stdbool.h>
 
 #include "video/surface.h"

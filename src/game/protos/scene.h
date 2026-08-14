@@ -10,7 +10,7 @@
 #include "game/utils/ticktimer.h"
 #include "resources/bk.h"
 #include "video/surface.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 typedef struct scene_t scene;
 typedef struct game_player_t game_player;

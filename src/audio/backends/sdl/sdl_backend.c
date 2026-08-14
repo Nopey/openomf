@@ -9,8 +9,8 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include <SDL.h>
-#include <SDL_mixer.h>
+#include <SDL3/SDL.h>
+#include <SDL3_mixer/SDL_mixer.h>
 
 static_assert(SDL_MIXER_VERSION_ATLEAST(2, 0, 4), "SDL_mixer version should be 2.0.4 or later");
 

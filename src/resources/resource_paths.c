@@ -5,7 +5,7 @@
 #include "utils/path.h"
 #include "utils/vector.h"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #define SDL_ORGANISATION_NAME ""
 #define SDL_PROJECT_NAME "OpenOMF"

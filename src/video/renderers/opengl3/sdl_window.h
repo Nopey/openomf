@@ -1,7 +1,7 @@
 #ifndef GL_CONTEXT_H
 #define GL_CONTEXT_H
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <stdbool.h>
 
 bool has_gl_available(int major_version, int minor_version);

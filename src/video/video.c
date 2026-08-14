@@ -1,4 +1,4 @@
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 #include "utils/c_array_util.h"
 #include "utils/log.h"

@@ -13,7 +13,7 @@
 #include "utils/msgbox.h"
 #include "utils/random.h"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <argtable3.h>
 #include <enet/enet.h>
 #include <stdio.h>

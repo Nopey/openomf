@@ -2,7 +2,7 @@
 #define JOYSTICK_H
 
 #include "controller/controller.h"
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 typedef struct {
     int x_axis;
