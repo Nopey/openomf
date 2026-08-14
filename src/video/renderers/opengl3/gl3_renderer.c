@@ -148,7 +148,7 @@ static bool setup_context(void *userdata, int window_w, int window_h, bool fulls
     }
 
     // Fetch viewport size which may be different from window size.
-    SDL_GL_GetDrawableSize(ctx->window, &ctx->viewport_w, &ctx->viewport_h);
+    SDL_GetWindowSizeInPixels(ctx->window, &ctx->viewport_w, &ctx->viewport_h);
 
     // Reset background color to black.
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -210,7 +210,7 @@ error_3:
     delete_program(ctx->palette_prog_id);
 
 error_2:
-    SDL_GL_DeleteContext(ctx->gl_context);
+    SDL_GL_DestroyContext(ctx->gl_context);
 
 error_1:
     SDL_DestroyWindow(ctx->window);
@@ -288,7 +288,7 @@ static bool reset_context_with(void *userdata, int window_w, int window_h, bool 
     }
 
     // Fetch viewport size which may be different from window size.
-    SDL_GL_GetDrawableSize(ctx->window, &ctx->viewport_w, &ctx->viewport_h);
+    SDL_GetWindowSizeInPixels(ctx->window, &ctx->viewport_w, &ctx->viewport_h);
 
     log_info("OpenGL3 renderer reset.");
     return success;
@@ -310,7 +310,7 @@ static void close_context(void *userdata) {
     delete_program(ctx->rgba_prog_id);
     delete_program(ctx->debug_atlas_prog_id);
     delete_program(ctx->scale_prog_id);
-    SDL_GL_DeleteContext(ctx->gl_context);
+    SDL_GL_DestroyContext(ctx->gl_context);
     SDL_DestroyWindow(ctx->window);
     log_info("OpenGL3 renderer closed.");
 }

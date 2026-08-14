@@ -858,14 +858,14 @@ static void load_hars(scene *scene, melee_local *local, bool player2_is_selectab
 
 int melee_event_cb(scene *scene, SDL_Event *e) {
     melee_local *local = scene_get_userdata(scene);
-    if(local->page == HAR_SELECT && e->type == SDL_KEYDOWN && SDLK_1 <= e->key.keysym.sym &&
-       e->key.keysym.sym <= SDLK_6) {
+    if(local->page == HAR_SELECT && e->type == SDL_EVENT_KEY_DOWN && SDLK_1 <= e->key.key &&
+       e->key.key <= SDLK_6) {
         // Disable color selection until we figure it out properly
         if(!local->network_game) {
             // color cheat:
             // press 1-3 to change pilot1 colors
             // press 4-6 to change pilot2 colors in 2 player
-            int idx = e->key.keysym.sym - SDLK_1;
+            int idx = e->key.key - SDLK_1;
             int pal_id = idx % 3;
             int player_id = idx / 3;
 

@@ -40,11 +40,11 @@ SDL_Surface *render_text(sd_font *font, const char *text, int area_w) {
     gmask = 0x0000ff00;
     bmask = 0x00ff0000;
     amask = 0xff000000;
-    if((surface = SDL_CreateRGBSurface(0, pix_w, pix_h, 32, rmask, gmask, bmask, amask)) == 0) {
+    if((surface = SDL_CreateSurface(pix_w, pix_h, SDL_GetPixelFormatForMasks(32, rmask, gmask, bmask, amask))) == 0) {
         return 0;
     }
-    if((tmp = SDL_CreateRGBSurface(0, font->h, font->h, 32, rmask, gmask, bmask, amask)) == 0) {
-        SDL_FreeSurface(surface);
+    if((tmp = SDL_CreateSurface(font->h, font->h, SDL_GetPixelFormatForMasks(32, rmask, gmask, bmask, amask))) == 0) {
+        SDL_DestroySurface(surface);
         return 0;
     }
 
@@ -61,7 +61,7 @@ SDL_Surface *render_text(sd_font *font, const char *text, int area_w) {
     }
 
     // All done.
-    SDL_FreeSurface(tmp);
+    SDL_DestroySurface(tmp);
     sd_rgba_image_free(&img);
     return surface;
 }
@@ -116,7 +116,7 @@ void display(sd_font *font, int _sc, const char *text) {
 
     // Init window
     SDL_Window *window = SDL_CreateWindow("Fonttool v0.1", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 320 * _sc,
-                                          200 * _sc, SDL_WINDOW_SHOWN);
+                                          200 * _sc, 0);
     if(!window) {
         printf("Could not create window: %s\n", SDL_GetError());
         goto d_exit_1;
@@ -140,16 +140,16 @@ void display(sd_font *font, int _sc, const char *text) {
     int run = 1;
     while(run) {
         if(SDL_PollEvent(&e)) {
-            if(e.type == SDL_QUIT) {
+            if(e.type == SDL_EVENT_QUIT) {
                 run = 0;
             }
         }
 
-        SDL_FillRect(window_surface, NULL, tcolor);
+        SDL_FillSurfaceRect(window_surface, NULL, tcolor);
         if(_sc == 1) {
             SDL_BlitSurface(surface, &srcrect, window_surface, &dstrect);
         } else {
-            SDL_BlitScaled(surface, &srcrect, window_surface, &dstrect);
+            SDL_BlitSurfaceScaled(surface, &srcrect, window_surface, &dstrect);
         }
         SDL_UpdateWindowSurface(window);
         SDL_Delay(10);
@@ -158,7 +158,7 @@ void display(sd_font *font, int _sc, const char *text) {
     // Quit
     SDL_DestroyWindow(window);
 d_exit_1:
-    SDL_FreeSurface(surface);
+    SDL_DestroySurface(surface);
 d_exit_0:
     SDL_Quit();
 }

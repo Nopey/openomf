@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
             // Initialize required audio
             SDL_zero(want);
             want.freq = 8000;
-            want.format = AUDIO_U8;
+            want.format = SDL_AUDIO_U8;
             want.channels = 1;
             want.samples = 4096;
             want.callback = stream;
@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
                     printf("Could not get correct playback format.\n");
                 } else {
                     printf("Starting playback ...\n");
-                    SDL_PauseAudioDevice(dev, 0);
+                    SDL_ResumeAudioDevice(dev);
                     while(streamer.pos < streamer.size) {
                         SDL_Delay(100);
                     }

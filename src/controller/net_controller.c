@@ -69,7 +69,7 @@ typedef struct {
     uint32_t last_peer_input_tick;
     // the last action the peer took
     uint8_t last_peer_action;
-    SDL_RWops *trace_file;
+    SDL_IOStream *trace_file;
     game_state *gs_bak;
     int winner;
 } wtf;
@@ -366,7 +366,7 @@ int rewind_and_replay(wtf *data, controller *ctrl) {
         }
     }
 
-    uint64_t replay_start = SDL_GetTicks64();
+    uint64_t replay_start = SDL_GetTicks();
     int tick_count = 0;
 
     uint32_t arena_hash;
@@ -475,9 +475,9 @@ int rewind_and_replay(wtf *data, controller *ctrl) {
                     int sz = snprintf(buf, sizeof(buf),
                                       "tick %u -- player 1 %s (%d) -- player 2 %s (%d) -- hash %" PRIu32 "\n", ev->tick,
                                       buf0, ev->events[0][0], buf1, ev->events[1][0], arena_hash);
-                    SDL_RWwrite(data->trace_file, buf, sz, 1);
+                    SDL_WriteIO(data->trace_file, buf, sz);
                     arena_state_dump(gs, buf, sizeof(buf));
-                    SDL_RWwrite(data->trace_file, buf, strlen(buf), 1);
+                    SDL_WriteIO(data->trace_file, buf, strlen(buf));
                 }
             }
             ev = iter_next(&it);
@@ -503,9 +503,9 @@ int rewind_and_replay(wtf *data, controller *ctrl) {
                 // no event, just write the hash
                 int sz = snprintf(buf, sizeof(buf), "tick %u  -- hash %" PRIu32 "\n", gs->tick - data->local_proposal,
                                   arena_hash);
-                SDL_RWwrite(data->trace_file, buf, sz, 1);
+                SDL_WriteIO(data->trace_file, buf, sz);
                 arena_state_dump(gs, buf, sizeof(buf));
-                SDL_RWwrite(data->trace_file, buf, strlen(buf), 1);
+                SDL_WriteIO(data->trace_file, buf, strlen(buf));
             }
         }
 
@@ -529,7 +529,7 @@ int rewind_and_replay(wtf *data, controller *ctrl) {
                 int sz = snprintf(buf, sizeof(buf), "---MISMATCH at %u (%u) got %" PRIu32 " expected %" PRIu32 "\n",
                                   gs->tick - data->local_proposal, data->peer_last_hash_tick, data->peer_last_hash,
                                   arena_hash);
-                SDL_RWwrite(data->trace_file, buf, sz, 1);
+                SDL_WriteIO(data->trace_file, buf, sz);
 
                 char buf0[EVENT_NAME_BUF_LEN];
                 char buf1[EVENT_NAME_BUF_LEN];
@@ -539,9 +539,9 @@ int rewind_and_replay(wtf *data, controller *ctrl) {
 
                 sz = snprintf(buf, sizeof(buf), "tick %u -- player 1 %s (%d) -- player 2 %s (%d) -- hash %" PRIu32 "\n",
                               ev->tick, buf0, ev->events[0][0], buf1, ev->events[1][0], arena_hash);
-                SDL_RWwrite(data->trace_file, buf, sz, 1);
+                SDL_WriteIO(data->trace_file, buf, sz);
                 arena_state_dump(gs, buf, sizeof(buf));
-                SDL_RWwrite(data->trace_file, buf, strlen(buf), 1);
+                SDL_WriteIO(data->trace_file, buf, strlen(buf));
             }
 
             log_debug("arena hash mismatch at %u (%u) -- got %" PRIu32 " expected %" PRIu32 "!",
@@ -581,7 +581,7 @@ int rewind_and_replay(wtf *data, controller *ctrl) {
         tick_count++;
     }
 
-    uint64_t replay_end = SDL_GetTicks64();
+    uint64_t replay_end = SDL_GetTicks();
 
     if(gs_new == NULL) {
         // we weren't able to make a new state backup, so restore the old one
@@ -648,7 +648,7 @@ void net_controller_free(controller *ctrl) {
         char buf[255];
         int sz = snprintf(buf, sizeof(buf), "------BEGIN TRANSCRIPT-------\n");
 
-        SDL_RWwrite(data->trace_file, buf, sz, 1);
+        SDL_WriteIO(data->trace_file, buf, sz);
 
         iterator it;
         list_iter_begin(&data->transcript, &it);
@@ -662,10 +662,10 @@ void net_controller_free(controller *ctrl) {
             event_names(buf1, ev->events[1]);
             sz = snprintf(buf, sizeof(buf), "tick %" PRIu32 " -- player 1 %s (%d) -- player 2 %s (%d)\n", ev->tick,
                           buf0, ev->events[0][0], buf1, ev->events[1][0]);
-            SDL_RWwrite(data->trace_file, buf, sz, 1);
+            SDL_WriteIO(data->trace_file, buf, sz);
         }
 
-        SDL_RWclose(data->trace_file);
+        SDL_CloseIO(data->trace_file);
     }
     controller_clear_hooks(ctrl->gs->menu_ctrl);
     ENetEvent event;
@@ -1320,7 +1320,7 @@ void net_controller_create(controller *ctrl, ENetHost *host, ENetPeer *peer, ENe
     data->last_peer_input_tick = 0;
     char *trace_file = settings_get()->net.trace_file;
     if(trace_file) {
-        data->trace_file = SDL_RWFromFile(trace_file, "w");
+        data->trace_file = SDL_IOFromFile(trace_file, "w");
         if(!data->trace_file) {
             log_debug("failed to open trace file");
         }

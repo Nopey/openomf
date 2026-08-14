@@ -250,21 +250,21 @@ static bool is_valid_input(char c) {
 static int textinput_event(component *c, SDL_Event *e) {
     // Handle selection
     textinput *ti = widget_get_obj(c);
-    if((e->type == SDL_TEXTINPUT || e->type == SDL_KEYDOWN) && ti->last_source != CTRL_TYPE_KEYBOARD) {
+    if((e->type == SDL_EVENT_TEXT_INPUT || e->type == SDL_EVENT_KEY_DOWN) && ti->last_source != CTRL_TYPE_KEYBOARD) {
         ti->last_source = CTRL_TYPE_KEYBOARD;
         c->dirty = true;
     }
     // Only accept input if:
     // - The global filter accepts that this is text supported by font (is_valid_input)
     // - there is no text filter callback set OR the filter callback function accepts the input.
-    if(e->type == SDL_TEXTINPUT && is_valid_input(e->text.text[0]) &&
+    if(e->type == SDL_EVENT_TEXT_INPUT && is_valid_input(e->text.text[0]) &&
        (ti->filter_cb == NULL || ti->filter_cb(e->text.text[0]))) {
         str_insert_at(&ti->buf, ti->pos, e->text.text[0]);
         str_truncate(&ti->buf, ti->max_chars - 1);
         ti->pos = smin2(ti->pos + 1, str_size(&ti->buf));
         refresh(c);
         return 0;
-    } else if(e->type == SDL_KEYDOWN) {
+    } else if(e->type == SDL_EVENT_KEY_DOWN) {
         const unsigned char *state = SDL_GetKeyboardState(NULL);
         if(state[SDL_SCANCODE_BACKSPACE]) {
             if(ti->pos > 0) {

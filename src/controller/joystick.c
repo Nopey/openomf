@@ -12,9 +12,9 @@
 void joystick_free(controller *ctrl) {
     joystick *k = ctrl->data;
     if(k->haptic) {
-        SDL_HapticClose(k->haptic);
+        SDL_CloseHaptic(k->haptic);
     }
-    SDL_GameControllerClose(k->joy);
+    SDL_CloseGamepad(k->joy);
     omf_free(k->keys);
     omf_free(k);
 }
@@ -27,12 +27,12 @@ int joystick_count(void) {
     int valid_joysticks = 0;
     SDL_Joystick *joy;
     for(int i = 0; i < SDL_NumJoysticks(); i++) {
-        joy = SDL_JoystickOpen(i);
+        joy = SDL_OpenJoystick(i);
         if(joy) {
             valid_joysticks++;
         }
-        if(SDL_JoystickGetAttached(joy)) {
-            SDL_JoystickClose(joy);
+        if(SDL_JoystickConnected(joy)) {
+            SDL_CloseJoystick(joy);
         }
     }
     return valid_joysticks;
@@ -42,11 +42,11 @@ int joystick_nth_id(int n) {
     SDL_Joystick *joy;
     int c = 0;
     for(int i = 0; i < SDL_NumJoysticks(); i++) {
-        joy = SDL_JoystickOpen(i);
+        joy = SDL_OpenJoystick(i);
         if(joy) {
             c++;
-            if(SDL_JoystickGetAttached(joy)) {
-                SDL_JoystickClose(joy);
+            if(SDL_JoystickConnected(joy)) {
+                SDL_CloseJoystick(joy);
             }
             if(c == n) {
                 return i;
@@ -80,17 +80,17 @@ int joystick_name_to_id(const char *name, int offset) {
 }
 
 static int internal_joystick_poll(joystick *k, controller *ctrl, ctrl_event **ev, bool allow_esc) {
-    if(!SDL_GameControllerGetAttached(k->joy)) {
+    if(!SDL_GamepadConnected(k->joy)) {
         controller_close(ctrl, ev);
         return 0;
     }
 
-    Sint16 x_axis = SDL_GameControllerGetAxis(k->joy, k->keys->x_axis);
-    Sint16 y_axis = SDL_GameControllerGetAxis(k->joy, k->keys->y_axis);
-    int dpadup = SDL_GameControllerGetButton(k->joy, k->keys->dpad[0]);
-    int dpaddown = SDL_GameControllerGetButton(k->joy, k->keys->dpad[1]);
-    int dpadleft = SDL_GameControllerGetButton(k->joy, k->keys->dpad[2]);
-    int dpadright = SDL_GameControllerGetButton(k->joy, k->keys->dpad[3]);
+    Sint16 x_axis = SDL_GetGamepadAxis(k->joy, k->keys->x_axis);
+    Sint16 y_axis = SDL_GetGamepadAxis(k->joy, k->keys->y_axis);
+    int dpadup = SDL_GetGamepadButton(k->joy, k->keys->dpad[0]);
+    int dpaddown = SDL_GetGamepadButton(k->joy, k->keys->dpad[1]);
+    int dpadleft = SDL_GetGamepadButton(k->joy, k->keys->dpad[2]);
+    int dpadright = SDL_GetGamepadButton(k->joy, k->keys->dpad[3]);
 
     int action = ACT_NONE;
 
@@ -133,9 +133,9 @@ static int internal_joystick_poll(joystick *k, controller *ctrl, ctrl_event **ev
     }
 
     // button input
-    if(SDL_GameControllerGetButton(k->joy, k->keys->punch)) {
+    if(SDL_GetGamepadButton(k->joy, k->keys->punch)) {
         action |= ACT_PUNCH;
-    } else if(SDL_GameControllerGetButton(k->joy, k->keys->kick)) {
+    } else if(SDL_GetGamepadButton(k->joy, k->keys->kick)) {
         action |= ACT_KICK;
     }
 
@@ -143,7 +143,7 @@ static int internal_joystick_poll(joystick *k, controller *ctrl, ctrl_event **ev
         joystick_cmd(ctrl, action, ev);
     }
 
-    if(allow_esc && SDL_GameControllerGetButton(k->joy, k->keys->escape)) {
+    if(allow_esc && SDL_GetGamepadButton(k->joy, k->keys->escape)) {
         joystick_cmd(ctrl, ACT_ESC, ev);
     }
 
@@ -166,21 +166,21 @@ int joystick_poll(controller *ctrl, ctrl_event **ev) {
 int joystick_rumble(controller *ctrl, float magnitude, int duration) {
     joystick *k = ctrl->data;
     if(k->rumble == 1) {
-        SDL_HapticRumblePlay(k->haptic, magnitude, duration);
+        SDL_PlayHapticRumble(k->haptic, magnitude, duration);
     }
     return 0;
 }
 
 static inline void internal_joystick_default_keys(joystick_keys *keys) {
-    keys->x_axis = SDL_CONTROLLER_AXIS_LEFTX;
-    keys->y_axis = SDL_CONTROLLER_AXIS_LEFTY;
-    keys->dpad[0] = SDL_CONTROLLER_BUTTON_DPAD_UP;
-    keys->dpad[1] = SDL_CONTROLLER_BUTTON_DPAD_DOWN;
-    keys->dpad[2] = SDL_CONTROLLER_BUTTON_DPAD_LEFT;
-    keys->dpad[3] = SDL_CONTROLLER_BUTTON_DPAD_RIGHT;
-    keys->punch = SDL_CONTROLLER_BUTTON_A;
-    keys->kick = SDL_CONTROLLER_BUTTON_B;
-    keys->escape = SDL_CONTROLLER_BUTTON_START;
+    keys->x_axis = SDL_GAMEPAD_AXIS_LEFTX;
+    keys->y_axis = SDL_GAMEPAD_AXIS_LEFTY;
+    keys->dpad[0] = SDL_GAMEPAD_BUTTON_DPAD_UP;
+    keys->dpad[1] = SDL_GAMEPAD_BUTTON_DPAD_DOWN;
+    keys->dpad[2] = SDL_GAMEPAD_BUTTON_DPAD_LEFT;
+    keys->dpad[3] = SDL_GAMEPAD_BUTTON_DPAD_RIGHT;
+    keys->punch = SDL_GAMEPAD_BUTTON_SOUTH;
+    keys->kick = SDL_GAMEPAD_BUTTON_EAST;
+    keys->escape = SDL_GAMEPAD_BUTTON_START;
 }
 
 int joystick_create(controller *ctrl, int joystick_id) {
@@ -194,12 +194,12 @@ int joystick_create(controller *ctrl, int joystick_id) {
     ctrl->free_fun = &joystick_free;
     ctrl->supports_delay = true;
 
-    k->joy = SDL_GameControllerOpen(joystick_id);
+    k->joy = SDL_OpenGamepad(joystick_id);
     if(k->joy) {
-        k->haptic = SDL_HapticOpenFromJoystick(SDL_GameControllerGetJoystick(k->joy));
+        k->haptic = SDL_OpenHapticFromJoystick(SDL_GetGamepadJoystick(k->joy));
         if(k->haptic) {
             if(SDL_HapticRumbleSupported(k->haptic)) {
-                if(SDL_HapticRumbleInit(k->haptic) == 0) {
+                if(SDL_InitHapticRumble(k->haptic) == 0) {
                     k->rumble = 1;
                     ctrl->rumble_fun = joystick_rumble;
                 } else {
@@ -223,7 +223,8 @@ static vector every_gamepad;
 
 void joystick_init(void) {
     int num_joysticks = SDL_NumJoysticks();
-    vector_create_with_size(&every_gamepad, sizeof(SDL_GameController *), num_joysticks);
+    vector_create_with_size(&every_gamepad, sizeof(SDL_Gamepad *),
+                            num_joysticks);
 
     for(int idx = 0; idx < num_joysticks; idx++) {
         joystick_deviceadded(idx);
@@ -233,9 +234,9 @@ void joystick_init(void) {
 void joystick_close(void) {
     iterator it;
     vector_iter_begin(&every_gamepad, &it);
-    SDL_GameController **gamepad;
+    SDL_Gamepad **gamepad;
     foreach(it, gamepad) {
-        SDL_GameControllerClose(*gamepad);
+        SDL_CloseGamepad(*gamepad);
     }
     vector_free(&every_gamepad);
 }
@@ -253,7 +254,7 @@ void joystick_menu_poll_all(controller *menu_ctrl, ctrl_event **ev) {
 
     iterator it;
     vector_iter_begin(&every_gamepad, &it);
-    SDL_GameController **gamepad;
+    SDL_Gamepad **gamepad;
     foreach(it, gamepad) {
         k.joy = *gamepad;
         internal_joystick_poll(&k, menu_ctrl, ev, true);
@@ -261,7 +262,7 @@ void joystick_menu_poll_all(controller *menu_ctrl, ctrl_event **ev) {
 }
 
 void joystick_deviceadded(int sdl_joystick_index) {
-    SDL_GameController *gamepad = SDL_GameControllerOpen(sdl_joystick_index);
+    SDL_Gamepad *gamepad = SDL_OpenGamepad(sdl_joystick_index);
     if(!gamepad) {
         return;
     }
@@ -271,10 +272,10 @@ void joystick_deviceadded(int sdl_joystick_index) {
 void joystick_deviceremoved(int sdl_joystick_instance_id) {
     unsigned gamepad_count = vector_size(&every_gamepad);
     for(unsigned idx = 0; idx < gamepad_count; idx++) {
-        SDL_GameController *gamepad = *(SDL_GameController **)vector_get(&every_gamepad, idx);
-        SDL_Joystick *joy = SDL_GameControllerGetJoystick(gamepad);
-        if(SDL_JoystickInstanceID(joy) == sdl_joystick_instance_id) {
-            SDL_GameControllerClose(gamepad);
+        SDL_Gamepad *gamepad = *(SDL_Gamepad **)vector_get(&every_gamepad, idx);
+        SDL_Joystick *joy = SDL_GetGamepadJoystick(gamepad);
+        if(SDL_GetJoystickID(joy) == sdl_joystick_instance_id) {
+            SDL_CloseGamepad(gamepad);
             vector_swapdelete_at(&every_gamepad, idx);
             return;
         }

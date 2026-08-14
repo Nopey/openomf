@@ -66,7 +66,7 @@ bool has_gl_available(int version_major, int version_minor) {
     // All succeeded! We got support!
     ret = true;
 
-    SDL_GL_DeleteContext(c);
+    SDL_GL_DestroyContext(c);
 exit_1:
     SDL_DestroyWindow(w);
 exit_0:
@@ -89,7 +89,7 @@ bool create_window(SDL_Window **window, int width, int height, bool fullscreen) 
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 
     SDL_Window *w = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
-                                     SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+                                     SDL_WINDOW_OPENGL);
     if(w == NULL) {
         log_error("Could not create window: %s", SDL_GetError());
         return false;

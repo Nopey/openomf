@@ -147,12 +147,14 @@ void menu_set_joystick2(component *c, void *userdata) {
     if(local->selected_player == 1) {
         k->ctrl_type1 = CTRL_TYPE_GAMEPAD;
         omf_free(k->joy_name1);
-        k->joy_name1 = omf_strdup(SDL_GameControllerNameForIndex(joystick_nth_id(2)));
+        k->joy_name1 = omf_strdup(/* FIXME MIGRATION: check for valid instance */
+                                  SDL_GetGamepadNameForID(GetJoystickInstanceFromIndex(joystick_nth_id(2))));
         k->joy_offset1 = joystick_offset(joystick_nth_id(2), k->joy_name1);
     } else {
         k->ctrl_type2 = CTRL_TYPE_GAMEPAD;
         omf_free(k->joy_name2);
-        k->joy_name2 = omf_strdup(SDL_GameControllerNameForIndex(joystick_nth_id(2)));
+        k->joy_name2 = omf_strdup(/* FIXME MIGRATION: check for valid instance */
+                                  SDL_GetGamepadNameForID(GetJoystickInstanceFromIndex(joystick_nth_id(2))));
         k->joy_offset2 = joystick_offset(joystick_nth_id(2), k->joy_name2);
     }
     reconfigure_controller(((scene *)userdata)->gs);

@@ -31,23 +31,24 @@ void scan_game_controllers(void) {
     SDL_Joystick *joy;
     char guid_str[33];
     for(int i = 0; i < SDL_NumJoysticks(); i++) {
-        joy = SDL_JoystickOpen(i);
+        joy = SDL_OpenJoystick(i);
         if(joy) {
-            SDL_JoystickGUID guid = SDL_JoystickGetGUID(joy);
-            SDL_JoystickGetGUIDString(guid, guid_str, 33);
+            SDL_GUID guid = SDL_GetJoystickGUID(joy);
+            SDL_GUIDToString(guid, guid_str, 33);
             log_info("Opened Joystick %d", i);
             log_info(" * Name:              %s", SDL_JoystickNameForIndex(i));
-            log_info(" * Number of Axes:    %d", SDL_JoystickNumAxes(joy));
-            log_info(" * Number of Buttons: %d", SDL_JoystickNumButtons(joy));
-            log_info(" * Number of Balls:   %d", SDL_JoystickNumBalls(joy));
-            log_info(" * Number of Hats:    %d", SDL_JoystickNumHats(joy));
+            log_info(" * Number of Axes:    %d", SDL_GetNumJoystickAxes(joy));
+            log_info(" * Number of Buttons: %d",
+                     SDL_GetNumJoystickButtons(joy));
+            log_info(" * Number of Balls:   %d", SDL_GetNumJoystickBalls(joy));
+            log_info(" * Number of Hats:    %d", SDL_GetNumJoystickHats(joy));
             log_info(" * GUID          :    %s", guid_str);
         } else {
             log_info("Joystick %d is unsupported", i);
         }
 
-        if(SDL_JoystickGetAttached(joy)) {
-            SDL_JoystickClose(joy);
+        if(SDL_JoystickConnected(joy)) {
+            SDL_CloseJoystick(joy);
         }
     }
 }
@@ -258,7 +259,7 @@ int main(int argc, char *argv[]) {
     log_info("Found SDL v%d.%d.%d", sdl_linked.major, sdl_linked.minor, sdl_linked.patch);
     log_info("Running on platform: %s", SDL_GetPlatform());
 
-    if(SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER)) {
+    if(SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD)) {
         err_msgbox("Joystick initialization failed: %s", SDL_GetError());
         goto exit_2;
     }

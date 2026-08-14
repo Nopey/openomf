@@ -49,7 +49,7 @@ void sprite_play(sd_af_file *af, sd_bk_file *bk, int scale, int anim, int sprite
     SDL_Rect dstrect;
     sd_sprite *s = sd_animation_get_sprite(sd_af_get_move(af, anim)->animation, sprite);
     SDL_Window *window = SDL_CreateWindow("OMF2097 Remake", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 320 * scale,
-                                          200 * scale, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+                                          200 * scale, SDL_WINDOW_OPENGL);
 
     if(!window) {
         printf("Could not create window: %s\n", SDL_GetError());
@@ -58,7 +58,8 @@ void sprite_play(sd_af_file *af, sd_bk_file *bk, int scale, int anim, int sprite
 
     printf("Sprite Info: pos=(%d,%d) size=(%d,%d) len=%u\n", s->pos.x, s->pos.y, s->width, s->height, s->len);
 
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, NULL,
+                                                SDL_RENDERER_ACCELERATED);
 
     uint32_t rmask = 0x000000ff;
     uint32_t gmask = 0x0000ff00;
@@ -75,7 +76,7 @@ void sprite_play(sd_af_file *af, sd_bk_file *bk, int scale, int anim, int sprite
     sd_sprite_rgba_decode(&img, s, bk->palettes[0]);
 
     if(!(surface =
-             SDL_CreateRGBSurfaceFrom((void *)img.data, img.w, img.h, 32, img.w * 4, rmask, gmask, bmask, amask))) {
+             SDL_CreateSurfaceFrom((void *)img.data, img.w, img.h, img.w * 4, SDL_GetPixelFormatForMasks(32, rmask, gmask, bmask, amask)))) {
         printf("Could not create surface: %s\n", SDL_GetError());
         return;
     }
@@ -85,7 +86,7 @@ void sprite_play(sd_af_file *af, sd_bk_file *bk, int scale, int anim, int sprite
         return;
     }
 
-    SDL_FreeSurface(surface);
+    SDL_DestroySurface(surface);
     sd_rgba_image_free(&img);
 
     rect.x = s->pos.x + 160;
@@ -101,12 +102,12 @@ void sprite_play(sd_af_file *af, sd_bk_file *bk, int scale, int anim, int sprite
     while(1) {
         SDL_Event e;
         if(SDL_PollEvent(&e)) {
-            if(e.type == SDL_QUIT) {
+            if(e.type == SDL_EVENT_QUIT) {
                 break;
-            } else if(e.type == SDL_KEYUP) {
+            } else if(e.type == SDL_EVENT_KEY_UP) {
                 int i = anim;
                 int changed = 0;
-                switch(e.key.keysym.sym) {
+                switch(e.key.key) {
                     case SDLK_RIGHT:
                         sprite = (sprite + 1) % sd_animation_get_sprite_count(sd_af_get_move(af, anim)->animation);
                         printf("sprite is now %d\n", sprite);
@@ -147,7 +148,7 @@ void sprite_play(sd_af_file *af, sd_bk_file *bk, int scale, int anim, int sprite
                         }
                         changed = 1;
                         break;
-                    case SDLK_p: {
+                    case SDLK_P : {
                         // print the move info
                         sd_move *mv = sd_af_get_move(af, i);
                         sd_animation *ani = mv->animation;
@@ -163,8 +164,7 @@ void sprite_play(sd_af_file *af, sd_bk_file *bk, int scale, int anim, int sprite
                     printf("Sprite Info: pos=(%d,%d) size=(%d,%d) len=%u\n", s->pos.x, s->pos.y, s->width, s->height,
                            s->len);
 
-                    if(!(surface = SDL_CreateRGBSurfaceFrom((void *)img.data, img.w, img.h, 32, img.w * 4, rmask, gmask,
-                                                            bmask, amask))) {
+                    if(!(surface = SDL_CreateSurfaceFrom((void *)img.data, img.w, img.h, img.w * 4, SDL_GetPixelFormatForMasks(32, rmask, gmask, bmask, amask)))) {
                         printf("Could not create surface: %s\n", SDL_GetError());
                         return;
                     }
@@ -174,7 +174,7 @@ void sprite_play(sd_af_file *af, sd_bk_file *bk, int scale, int anim, int sprite
                         return;
                     }
 
-                    SDL_FreeSurface(surface);
+                    SDL_DestroySurface(surface);
                     sd_rgba_image_free(&img);
 
                     rect.x = s->pos.x + 160;
@@ -188,7 +188,7 @@ void sprite_play(sd_af_file *af, sd_bk_file *bk, int scale, int anim, int sprite
         SDL_SetRenderTarget(renderer, rendertarget);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderFillRect(renderer, &dstrect);
-        SDL_RenderCopy(renderer, texture, NULL, &rect);
+        SDL_RenderTexture(renderer, texture, NULL, &rect);
 
         // render the collision data
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
@@ -198,13 +198,14 @@ void sprite_play(sd_af_file *af, sd_bk_file *bk, int scale, int anim, int sprite
         vector_iter_begin(&animation->coord_table, &it);
         foreach(it, coord) {
             if(coord->frame_id == sprite) {
-                SDL_RenderDrawPoint(renderer, 160 + coord->pos.x, 100 + coord->pos.y);
+                SDL_RenderPoint(renderer, (float)(160 + coord->pos.x),
+                                (float)(100 + coord->pos.y));
             }
         }
 
         // Switch to screen target & scale
         SDL_SetRenderTarget(renderer, NULL);
-        SDL_RenderCopy(renderer, rendertarget, NULL, &dstrect);
+        SDL_RenderTexture(renderer, rendertarget, NULL, &dstrect);
         SDL_RenderPresent(renderer);
         SDL_Delay(1); // don't chew too much CPU
     }

@@ -59,25 +59,25 @@ static void destroy_backend(audio_backend *player) {
 
 static const char *get_sdl_audio_format_string(SDL_AudioFormat format) {
     switch(format) {
-        case AUDIO_U8:
+        case SDL_AUDIO_U8 :
             return "AUDIO_U8";
-        case AUDIO_S8:
+        case SDL_AUDIO_S8 :
             return "AUDIO_S8";
         case AUDIO_U16LSB:
             return "AUDIO_U16LSB";
-        case AUDIO_S16LSB:
+        case SDL_AUDIO_S16LE :
             return "AUDIO_S16LSB";
         case AUDIO_U16MSB:
             return "AUDIO_U16MSB";
-        case AUDIO_S16MSB:
+        case SDL_AUDIO_S16BE :
             return "AUDIO_S16MSB";
-        case AUDIO_S32LSB:
+        case SDL_AUDIO_S32LE :
             return "AUDIO_S32LSB";
-        case AUDIO_S32MSB:
+        case SDL_AUDIO_S32BE :
             return "AUDIO_S32MSB";
-        case AUDIO_F32LSB:
+        case SDL_AUDIO_F32LE :
             return "AUDIO_F32LSB";
-        case AUDIO_F32MSB:
+        case SDL_AUDIO_F32BE :
             return "AUDIO_F32MSB";
     }
     return "UNKNOWN";
@@ -95,7 +95,7 @@ static bool audio_get_chunk(const sdl_audio_context *ctx, Mix_Chunk *chunk, cons
                             const int src_freq, const int volume) {
     SDL_AudioCVT cvt;
 
-    if(SDL_BuildAudioCVT(&cvt, AUDIO_U8, 1, src_freq, ctx->format, ctx->channels, ctx->sample_rate) < 0) {
+    if(SDL_BuildAudioCVT(&cvt, SDL_AUDIO_U8, 1, src_freq, ctx->format, ctx->channels, ctx->sample_rate) < 0) {
         log_error("Unable to build audio converter: %s", SDL_GetError());
         goto exit_0;
     }
@@ -259,10 +259,10 @@ static bool setup_backend_context(void *userdata, const unsigned sample_rate, co
     log_info("Requested audio device with options:");
     log_info(" * Sample rate: %uHz", sample_rate);
     log_info(" * Channels: %d", mono ? 1 : 2);
-    log_info(" * Format: %s", get_sdl_audio_format_string(AUDIO_S16SYS));
+    log_info(" * Format: %s", get_sdl_audio_format_string(SDL_AUDIO_S16));
 
     // Request a device -- the actual configuration we get back may differ.
-    if(Mix_OpenAudioDevice(sample_rate, AUDIO_S16SYS, mono ? 1 : 2, 2048, NULL, 0) != 0) {
+    if(Mix_OpenAudioDevice(sample_rate, SDL_AUDIO_S16, mono ? 1 : 2, 2048, NULL, 0) != 0) {
         log_error("Unable to initialize audio device: %s", SDL_GetError());
         goto error_2;
     }

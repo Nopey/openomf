@@ -168,7 +168,7 @@ void engine_run(const engine_init_flags *init_flags) {
     while(start_timeout > 0) {
         start_timeout--;
         while(SDL_PollEvent(&e)) {
-            if(e.type == SDL_QUIT) {
+            if(e.type == SDL_EVENT_QUIT) {
                 return;
             }
         }
@@ -190,7 +190,7 @@ void engine_run(const engine_init_flags *init_flags) {
     joystick_init();
 
     // Game loop
-    uint64_t frame_start = SDL_GetTicks64(); // Set game tick timer
+    uint64_t frame_start = SDL_GetTicks(); // Set game tick timer
     int dynamic_wait = 0;
     int static_wait = 0;
     while(run && game_state_is_running(gs)) {
@@ -199,38 +199,38 @@ void engine_run(const engine_init_flags *init_flags) {
         while(SDL_PollEvent(&e)) {
             // Handle other events
             switch(e.type) {
-                case SDL_QUIT:
+                case SDL_EVENT_QUIT :
                     run = 0;
                     break;
-                case SDL_KEYDOWN:
-                    if(e.key.keysym.sym == SDLK_F1) {
+                case SDL_EVENT_KEY_DOWN :
+                    if(e.key.key == SDLK_F1) {
                         video_schedule_screenshot(save_screenshot);
                     }
-                    if(e.key.keysym.sym == SDLK_F2) {
+                    if(e.key.key == SDLK_F2) {
                         save_palette_shot();
                     }
-                    if(e.key.keysym.sym == SDLK_F3) {
+                    if(e.key.key == SDLK_F3) {
                         if(gs->rec) {
                             save_rec(gs);
                         }
                     }
-                    if(e.key.keysym.sym == SDLK_F9) {
+                    if(e.key.key == SDLK_F9) {
                         video_draw_atlas(true);
                     }
-                    if(e.key.keysym.sym == SDLK_F10) {
+                    if(e.key.key == SDLK_F10) {
                         video_draw_atlas(false);
                     }
-                    if(e.key.keysym.sym == SDLK_F5) {
+                    if(e.key.key == SDLK_F5) {
                         visual_debugger = !visual_debugger;
                     }
-                    if(visual_debugger && !console_window_is_open() && e.key.keysym.sym == SDLK_SPACE) {
+                    if(visual_debugger && !console_window_is_open() && e.key.key == SDLK_SPACE) {
                         dynamic_wait += 20;
                         static_wait += 20;
                     } else if(visual_debugger && !console_window_is_open() &&
-                              (e.key.keysym.sym >= SDLK_1 && e.key.keysym.sym <= SDLK_9)) {
-                        debugger_proceed = 1 + e.key.keysym.sym - SDLK_1;
+                              (e.key.key >= SDLK_1 && e.key.key <= SDLK_9)) {
+                        debugger_proceed = 1 + e.key.key - SDLK_1;
                     }
-                    if(!console_window_is_open() && e.key.keysym.sym == SDLK_BACKSPACE) {
+                    if(!console_window_is_open() && e.key.key == SDLK_BACKSPACE) {
                         if(game_state_get_player(gs, 0)->ctrl->type == CTRL_TYPE_REC) {
                             controller_rewind(game_state_get_player(gs, 0)->ctrl);
                             controller_rewind(game_state_get_player(gs, 1)->ctrl);
@@ -249,35 +249,35 @@ void engine_run(const engine_init_flags *init_flags) {
                             visual_debugger = 1;
                         }
                     }
-                    if(e.key.keysym.sym == SDLK_F6) {
+                    if(e.key.key == SDLK_F6) {
                         debugger_render = !debugger_render;
                     }
                     break;
-                case SDL_JOYDEVICEADDED:
+                case SDL_EVENT_JOYSTICK_ADDED :
                     joystick_deviceadded(e.jdevice.which);
                     break;
-                case SDL_JOYDEVICEREMOVED:
+                case SDL_EVENT_JOYSTICK_REMOVED :
                     joystick_deviceremoved(e.jdevice.which);
                     break;
-                case SDL_MOUSEMOTION:
+                case SDL_EVENT_MOUSE_MOTION :
                     mouse_visible_ticks = 1000;
                     SDL_ShowCursor(1);
                     break;
                 case SDL_WINDOWEVENT:
                     switch(e.window.event) {
-                        case SDL_WINDOWEVENT_MINIMIZED:
+                        case SDL_EVENT_WINDOW_MINIMIZED :
                             log_debug("MINIMIZED");
                             enable_screen_updates = 0;
                             break;
-                        case SDL_WINDOWEVENT_HIDDEN:
+                        case SDL_EVENT_WINDOW_HIDDEN :
                             log_debug("HIDDEN");
                             enable_screen_updates = 0;
                             break;
-                        case SDL_WINDOWEVENT_MAXIMIZED:
+                        case SDL_EVENT_WINDOW_MAXIMIZED :
                             log_debug("MAXIMIZED");
                             enable_screen_updates = 1;
                             break;
-                        case SDL_WINDOWEVENT_RESTORED:
+                        case SDL_EVENT_WINDOW_RESTORED :
                             video_get_state(NULL, NULL, &check_fs, NULL, NULL, NULL);
                             if(check_fs) {
                                 video_reinit_renderer();
@@ -285,7 +285,7 @@ void engine_run(const engine_init_flags *init_flags) {
                             log_debug("RESTORED");
                             enable_screen_updates = 1;
                             break;
-                        case SDL_WINDOWEVENT_SHOWN:
+                        case SDL_EVENT_WINDOW_SHOWN :
                             enable_screen_updates = 1;
                             log_debug("SHOWN");
                             break;
@@ -294,14 +294,14 @@ void engine_run(const engine_init_flags *init_flags) {
             }
 
             // Console events
-            if(e.type == SDL_KEYDOWN) {
+            if(e.type == SDL_EVENT_KEY_DOWN) {
                 if(console_window_is_open() &&
-                   (e.key.keysym.scancode == SDL_SCANCODE_GRAVE || e.key.keysym.sym == SDLK_BACKQUOTE ||
-                    e.key.keysym.sym == SDLK_TAB || e.key.keysym.sym == SDLK_ESCAPE)) {
+                   (e.key.scancode == SDL_SCANCODE_GRAVE || e.key.key == SDLK_GRAVE ||
+                    e.key.key == SDLK_TAB || e.key.key == SDLK_ESCAPE)) {
                     console_window_close();
                     continue;
-                } else if(e.key.keysym.sym == SDLK_TAB || e.key.keysym.sym == SDLK_BACKQUOTE ||
-                          e.key.keysym.scancode == SDL_SCANCODE_GRAVE) {
+                } else if(e.key.key == SDLK_TAB || e.key.key == SDLK_GRAVE ||
+                          e.key.scancode == SDL_SCANCODE_GRAVE) {
                     console_window_open();
                     continue;
                 }
@@ -318,15 +318,15 @@ void engine_run(const engine_init_flags *init_flags) {
 
         // hide mouse after n ticks
         if(mouse_visible_ticks > 0) {
-            mouse_visible_ticks -= SDL_GetTicks64() - frame_start;
+            mouse_visible_ticks -= SDL_GetTicks() - frame_start;
             if(mouse_visible_ticks <= 0) {
                 SDL_ShowCursor(0);
             }
         }
 
         // Render scene
-        uint64_t frame_dt = SDL_GetTicks64() - frame_start;
-        frame_start = SDL_GetTicks64();
+        uint64_t frame_dt = SDL_GetTicks() - frame_start;
+        frame_start = SDL_GetTicks();
         if(!visual_debugger) {
             dynamic_wait += frame_dt;
             static_wait += frame_dt;

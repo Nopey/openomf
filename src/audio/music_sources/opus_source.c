@@ -147,7 +147,7 @@ bool opus_load(music_source *src, const int channels, const int sample_rate, con
     context->loop_end = 0;
     opus_read_loop_tags(context);
     opus_announce_track(context);
-    if(SDL_BuildAudioCVT(&context->cvt, AUDIO_S16, 2, 48000, AUDIO_S16, channels, sample_rate) < 0) {
+    if(SDL_BuildAudioCVT(&context->cvt, SDL_AUDIO_S16LE, 2, 48000, SDL_AUDIO_S16LE, channels, sample_rate) < 0) {
         log_error("Audio converter creation failed: %s", SDL_GetError());
         goto exit_1;
     }
@@ -177,7 +177,7 @@ bool opus_load_memory(music_source *src, int channels, int sample_rate, const un
     context->loop_end = 0;
     opus_read_loop_tags(context);
     opus_announce_track(context);
-    if(SDL_BuildAudioCVT(&context->cvt, AUDIO_S16, 2, 48000, AUDIO_S16, channels, sample_rate) < 0) {
+    if(SDL_BuildAudioCVT(&context->cvt, SDL_AUDIO_S16LE, 2, 48000, SDL_AUDIO_S16LE, channels, sample_rate) < 0) {
         log_error("Audio converter creation failed: %s", SDL_GetError());
         goto exit_1;
     }

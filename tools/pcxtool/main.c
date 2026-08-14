@@ -17,7 +17,7 @@ static void show_pcx(pcx_file *pcx) {
     SDL_Texture *background;
     SDL_Texture *rendertarget;
     SDL_Window *window = SDL_CreateWindow("OMF2097 Remake", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 320, 200,
-                                          SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+                                          SDL_WINDOW_OPENGL);
 
     if(!window) {
         printf("Could not create window: %s\n", SDL_GetError());
@@ -27,7 +27,8 @@ static void show_pcx(pcx_file *pcx) {
     sd_rgba_image img;
     sd_vga_image_decode(&img, &pcx->image, &pcx->palette);
 
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, NULL,
+                                                SDL_RENDERER_ACCELERATED);
 
     SDL_Rect dstrect;
 
@@ -45,7 +46,7 @@ static void show_pcx(pcx_file *pcx) {
     bmask = 0x00ff0000;
     amask = 0xff000000;
 
-    if(!(surface = SDL_CreateRGBSurfaceFrom((void *)img.data, 320, 200, 32, 320 * 4, rmask, gmask, bmask, amask))) {
+    if(!(surface = SDL_CreateSurfaceFrom((void *)img.data, 320, 200, 320 * 4, SDL_GetPixelFormatForMasks(32, rmask, gmask, bmask, amask)))) {
         printf("Could not create surface: %s\n", SDL_GetError());
         return;
     }
@@ -61,21 +62,21 @@ static void show_pcx(pcx_file *pcx) {
         return;
     }
 
-    SDL_FreeSurface(surface);
+    SDL_DestroySurface(surface);
     sd_rgba_image_free(&img);
 
     while(1) {
         SDL_Event e;
         if(SDL_PollEvent(&e)) {
-            if(e.type == SDL_QUIT) {
+            if(e.type == SDL_EVENT_QUIT) {
                 break;
             }
         }
         SDL_RenderClear(renderer);
         SDL_SetRenderTarget(renderer, rendertarget);
-        SDL_RenderCopy(renderer, background, NULL, NULL);
+        SDL_RenderTexture(renderer, background, NULL, NULL);
         SDL_SetRenderTarget(renderer, NULL);
-        SDL_RenderCopy(renderer, rendertarget, NULL, &dstrect);
+        SDL_RenderTexture(renderer, rendertarget, NULL, &dstrect);
         SDL_RenderPresent(renderer);
         SDL_Delay(10); // don't chew too much CPU
     }

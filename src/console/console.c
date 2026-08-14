@@ -275,7 +275,7 @@ void console_close(void) {
 }
 
 void console_event(game_state *gs, SDL_Event *e) {
-    if(e->type == SDL_TEXTINPUT) {
+    if(e->type == SDL_EVENT_TEXT_INPUT) {
         size_t len = str_size(&con->input);
         if(strlen(e->text.text) == 1) {
             // make sure it is not a unicode sequence
@@ -286,9 +286,9 @@ void console_event(game_state *gs, SDL_Event *e) {
             }
             console_refresh();
         }
-    } else if(e->type == SDL_KEYDOWN) {
+    } else if(e->type == SDL_EVENT_KEY_DOWN) {
         size_t len = str_size(&con->input);
-        unsigned char scancode = e->key.keysym.scancode;
+        unsigned char scancode = e->key.scancode;
         if(scancode == SDL_SCANCODE_UP) {
             if(con->hist_pos < HISTORY_MAX && con->hist_pos < (signed int)(list_size(&con->history) - 1)) {
                 con->hist_pos++;
@@ -377,7 +377,7 @@ bool console_window_is_open(void) {
 }
 
 void console_window_open(void) {
-    if(!SDL_IsTextInputActive()) {
+    if(!SDL_TextInputActive()) {
         SDL_StartTextInput();
         con->owns_input = true;
     } else {

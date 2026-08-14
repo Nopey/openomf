@@ -19,7 +19,7 @@ typedef struct log_target {
     log_level level;
     bool colors;
     bool close;
-    SDL_mutex *lock;
+    SDL_Mutex *lock;
 } log_target;
 
 typedef struct log_state {

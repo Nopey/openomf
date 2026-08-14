@@ -57,7 +57,7 @@ void menu_help_render(component *c) {
 
 static int menu_help_event(component *c, SDL_Event *event) {
     help_menu_data *local = menu_get_userdata(c);
-    SDL_Scancode sc = event->key.keysym.scancode;
+    SDL_Scancode sc = event->key.scancode;
     if(sc == SDL_SCANCODE_PAGEUP && local->page > 0) {
         local->page--;
         help_menu_update(local);
